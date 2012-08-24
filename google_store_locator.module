@@ -1,0 +1,103 @@
+<?php
+/**
+ * @file
+ * Code for the Google Store Locator feature.
+ */
+
+include_once 'google_store_locator.features.inc';
+
+/**
+ *Implements hook_menu()
+ *
+ *By using the block render array as the page callback for
+ *this menu item then we can get a page with only the block
+ *content as opposed to making a blank node and putting the block in the content
+ *region.
+ */
+
+function store_locator_menu(){
+
+  $items['store_locator'] = array(
+    'title' => 'Store Locator',
+    'description' => t('Store locator map using Google Store Location Library'),
+    'page callback' => 'store_locator_block_contents',
+    'access arguments' => array('access site-wide contact form'),
+  );
+
+ return $items;
+
+}
+
+
+
+/**
+ * A module-defined block content function.
+ */
+function store_locator_block_contents() {
+  /*
+  switch ($which_block) {
+    case 'store_locator':
+      //Here we're going to add all our javascript elements.
+      // Block content can be returned in two formats: renderable arrays
+      // are preferred though a simple string will work as well.*/
+      $output =  array(
+        'google_maps_api' => array(
+          '#attached' => array(
+            'js' => array('//maps.googleapis.com/maps/api/js?sensor=false&libraries=places', 'external'),
+          ),
+        ),
+
+        'google_ajax_api' => array(
+          '#attached' => array(
+            'js' => array('//ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js', 'external'),
+          ),
+        ),
+
+        'compiled_js' => array(
+          '#attached' => array(
+            'js' => array(libraries_get_path('storelocator') . '/js/store-locator.compiled.js'),
+          ),
+        ),
+
+        'data_feed_js' => array(
+          '#attached' => array(
+            'js' => array(libraries_get_path('storelocator') . '/default/data-feed.js'),
+          ),
+        ),
+
+        'panel_js' => array(
+          '#attached' => array(
+            'js' => array(libraries_get_path('storelocator') . '/default/panel.js'),
+          ),
+        ),
+
+        'style_sheet' => array(
+          '#attached' => array(
+            'css' => array(libraries_get_path('storelocator') . '/css/storelocator.css'),
+          ),
+        ),
+
+        'styling' => array(
+          '#type' => 'markup',
+          '#markup' => '<style type="text/css">
+                        body { font-family: sans-serif; }
+                        #map-canvas, #panel { height: 500px; }
+                        #panel { width: 300px; float: left; margin-right: 10px; }
+                        #panel .feature-filter label { width: 130px; }
+                        p.attribution, p.attribution a { color: #666; }
+                        </style>'
+        ),
+
+        'panel_element' => array(
+          '#type' => 'markup',
+          '#markup' => '<div id="panel"></div>'
+        ),
+
+        'map_element' => array(
+          '#type' => 'markup',
+          '#markup' => '<div id="map-canvas"></div>'
+        ),
+      );
+
+      return $output;
+}
