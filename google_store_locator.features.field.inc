@@ -10,14 +10,14 @@
 function google_store_locator_field_default_fields() {
   $fields = array();
 
-  // Exported field: 'node-store_location-store_locator_addressfield'.
-  $fields['node-store_location-google_store_locator_addressfield'] = array(
+  // Exported field: 'node-store_location-gsl_addressfield'.
+  $fields['node-store_location-gsl_addressfield'] = array(
     'field_config' => array(
       'active' => '1',
       'cardinality' => '1',
       'deleted' => '0',
       'entity_types' => array(),
-      'field_name' => 'google_store_locator_addressfield',
+      'field_name' => 'gsl_addressfield',
       'foreign keys' => array(),
       'indexes' => array(),
       'locked' => '0',
@@ -64,7 +64,7 @@ function google_store_locator_field_default_fields() {
         ),
       ),
       'entity_type' => 'node',
-      'field_name' => 'google_store_locator_addressfield',
+      'field_name' => 'gsl_addressfield',
       'label' => 'Store Locator Address',
       'required' => FALSE,
       'settings' => array(
@@ -84,14 +84,14 @@ function google_store_locator_field_default_fields() {
     ),
   );
 
-  // Exported field: 'node-store_location-store_locator_geofield'.
-  $fields['node-store_location-google_store_locator_geofield'] = array(
+  // Exported field: 'node-store_location-gsl_geofield'.
+  $fields['node-store_location-gsl_geofield'] = array(
     'field_config' => array(
       'active' => '1',
       'cardinality' => '1',
       'deleted' => '0',
       'entity_types' => array(),
-      'field_name' => 'google_store_locator_geofield',
+      'field_name' => 'gsl_geofield',
       'foreign keys' => array(),
       'indexes' => array(),
       'locked' => '0',
@@ -134,7 +134,7 @@ function google_store_locator_field_default_fields() {
         ),
       ),
       'entity_type' => 'node',
-      'field_name' => 'google_store_locator_geofield',
+      'field_name' => 'gsl_geofield',
       'label' => 'Store Locator Geofield',
       'required' => 0,
       'settings' => array(
@@ -150,7 +150,7 @@ function google_store_locator_field_default_fields() {
         'module' => 'geocoder',
         'settings' => array(
           'delta_handling' => 'default',
-          'geocoder_field' => 'google_store_locator_addressfield',
+          'geocoder_field' => 'gsl_addressfield',
           'geocoder_handler' => 'google',
           'handler_settings' => array(
             'google' => array(
