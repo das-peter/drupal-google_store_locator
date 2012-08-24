@@ -10,6 +10,7 @@ dependencies[] = features
 dependencies[] = field_sql_storage
 dependencies[] = geocoder
 dependencies[] = geofield
+dependencies[] = libraries
 dependencies[] = node
 dependencies[] = strongarm
 dependencies[] = views
