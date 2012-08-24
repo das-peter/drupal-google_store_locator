@@ -61,13 +61,13 @@ function google_store_locator_block_contents() {
 
         'data_feed_js' => array(
           '#attached' => array(
-            'js' => array('/default/data-feed.js'),
+            'js' => array(drupal_get_path('module', 'google_store_locator') . '/js/data-feed.js'),
           ),
         ),
 
         'panel_js' => array(
           '#attached' => array(
-            'js' => array('/default/panel.js'),
+            'js' => array(drupal_get_path('module', 'google_store_locator') . '/js/panel.js'),
           ),
         ),
 
