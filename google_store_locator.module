@@ -15,12 +15,12 @@ include_once 'google_store_locator.features.inc';
  *region.
  */
 
-function store_locator_menu(){
+function google_store_locator_menu(){
 
   $items['store_locator'] = array(
     'title' => 'Store Locator',
     'description' => t('Store locator map using Google Store Location Library'),
-    'page callback' => 'store_locator_block_contents',
+    'page callback' => 'google_store_locator_block_contents',
     'access arguments' => array('access site-wide contact form'),
   );
 
@@ -33,10 +33,10 @@ function store_locator_menu(){
 /**
  * A module-defined block content function.
  */
-function store_locator_block_contents() {
+function google_store_locator_block_contents() {
   /*
   switch ($which_block) {
-    case 'store_locator':
+    case 'google_store_locator':
       //Here we're going to add all our javascript elements.
       // Block content can be returned in two formats: renderable arrays
       // are preferred though a simple string will work as well.*/
