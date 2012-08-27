@@ -39,7 +39,7 @@ GSLdataSource.prototype.parse_ = function(csv) {
 
     var store = new storeLocator.Store(row.uuid, position, features,  {
       title: row.Store_name,
-      address: this.join_([row.Street_add, locality], '<br>'),
+      address: this.join_([row.Street_add, locality], '<br>')
     });
     stores.push(store);
   }
