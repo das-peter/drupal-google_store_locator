@@ -100,21 +100,16 @@ function google_store_locator_contents() {
       ),
     ),
 
-    'style_sheet' => array(
+    'store_locator_sheet' => array(
       '#attached' => array(
         'css' => array(libraries_get_path('storelocator') . '/css/storelocator.css'),
       ),
     ),
 
-    'styling' => array(
-      '#type' => 'markup',
-      '#markup' => '<style type="text/css">
-        body { font-family: sans-serif; }
-        #map-canvas, #panel { height: 500px; }
-        #panel { width: 300px; float: left; margin-right: 10px; }
-        #panel .feature-filter label { width: 130px; }
-        p.attribution, p.attribution a { color: #666; }
-        </style>',
+    'elements_sheet' => array(
+      '#attached' => array(
+        'css' => array(drupal_get_path('module', 'google_store_locator') . '/theme/google_store_locator.css'),
+      ),
     ),
 
     'panel_element' => array(
