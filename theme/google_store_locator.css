@@ -1,4 +1,13 @@
-#map-canvas, #panel { height: 500px; }
-#panel { width: 300px; float: left; margin-right: 10px; }
-#panel .feature-filter label { width: 130px; }
-p.attribution, p.attribution a { color: #666; }
+#map-canvas {
+  height: 500px;
+}
+
+#panel {
+  float: left;
+  height: 500px;
+  margin-right: 10px;
+  width: 300px;
+}
+
+
+
