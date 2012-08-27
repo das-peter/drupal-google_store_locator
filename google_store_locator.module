@@ -17,23 +17,56 @@ include_once 'google_store_locator.features.inc';
 
 function google_store_locator_menu(){
 
-  $items['store_locator'] = array(
+  $items[variable_get('gsl_display_path', 'store_locator')] = array(
     'title' => 'Store Locator',
     'description' => t('Store locator map using Google Store Location Library'),
     'page callback' => 'google_store_locator_block_contents',
     'access arguments' => array('access site-wide contact form'),
   );
-
- return $items;
-
+  $items['admin/config/search/google_store_locator'] = array(
+    'title' => 'Google Store Locator',
+    'description' => 'Google Store Locator Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('google_store_locator_admin_form'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+    'menu_name' => 'management',
+    'weight' => 1,
+  );
+  return $items;
 }
 
-
+/**
+ * Create admin form for Google Store Locator.
+ */
+function google_store_locator_admin_form($form, &$form_state) {
+  $form['description'] = array(
+    '#type' => 'item',
+    '#title' => t('Google Store Locator'),
+  );
+  $form['google_store_locator']['gsl_csv_path'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Where is the CSV file located?',
+    '#default_value' => variable_get('gsl_csv_path', 'download/location-export'),
+    '#required' => TRUE,
+  );
+  $form['google_store_locator']['gsl_display_path'] = array(
+    '#type' => 'textfield',
+    '#title' => 'What is the desired path for the store locator?',
+    '#default_value' => variable_get('gsl_display_path', 'store_locator'),
+    '#description' => 'By default it will be served from /store_locator',
+    '#required' => TRUE,
+  );
+  $form = system_settings_form($form);
+  $form['#submit'][] = 'menu_rebuild';
+  return $form;
+}
 
 /**
  * A module-defined block content function.
  */
 function google_store_locator_block_contents() {
+  drupal_add_js(array('gsl' => array('datapath' => variable_get('gsl_csv_path', 'download/location-export'))), 'setting');
   /*
   switch ($which_block) {
     case 'google_store_locator':

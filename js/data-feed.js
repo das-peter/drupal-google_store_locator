@@ -7,7 +7,7 @@ function GSLdataSource() {
 
   var that = this;
   //
-  $.get('download/location-export', function(data) {
+  $.get(Drupal.settings.gsl['datapath'], function(data) {
     that.setStores(that.parse_(data));
   });
 }
