@@ -109,12 +109,12 @@ function google_store_locator_contents() {
     'styling' => array(
       '#type' => 'markup',
       '#markup' => '<style type="text/css">
-                    body { font-family: sans-serif; }
-                    #map-canvas, #panel { height: 500px; }
-                    #panel { width: 300px; float: left; margin-right: 10px; }
-                    #panel .feature-filter label { width: 130px; }
-                    p.attribution, p.attribution a { color: #666; }
-                    </style>',
+        body { font-family: sans-serif; }
+        #map-canvas, #panel { height: 500px; }
+        #panel { width: 300px; float: left; margin-right: 10px; }
+        #panel .feature-filter label { width: 130px; }
+        p.attribution, p.attribution a { color: #666; }
+        </style>',
     ),
 
     'panel_element' => array(
