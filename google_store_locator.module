@@ -15,14 +15,14 @@ include_once 'google_store_locator.features.inc';
 function google_store_locator_menu() {
 
   $items[variable_get('gsl_display_path', 'store_locator')] = array(
-    'title' => 'Store Locator',
-    'description' => 'Store locator map using Google Store Location Library',
+    'title' => t('Store Locator'),
+    'description' => t('Store locator map using Google Store Location Library'),
     'page callback' => 'google_store_locator_contents',
-    'access arguments' => array('access site-wide contact form'),
+    'access arguments' => array('access content'),
   );
   $items['admin/config/search/google_store_locator'] = array(
-    'title' => 'Google Store Locator',
-    'description' => 'Google Store Locator Settings',
+    'title' => t('Google Store Locator'),
+    'description' => t('Google Store Locator Settings'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('google_store_locator_admin_form'),
     'access arguments' => array('access administration pages'),
@@ -43,32 +43,32 @@ function google_store_locator_admin_form($form, &$form_state) {
   );
   $form['google_store_locator']['gsl_csv_path'] = array(
     '#type' => 'textfield',
-    '#title' => 'Where is the CSV file located?',
+    '#title' => t('Where is the CSV file located?'),
     '#default_value' => variable_get('gsl_csv_path', 'download/location-export'),
     '#required' => TRUE,
   );
   $form['google_store_locator']['gsl_display_path'] = array(
     '#type' => 'textfield',
-    '#title' => 'What is the desired path for the store locator?',
+    '#title' => t('What is the desired path for the store locator?'),
     '#default_value' => variable_get('gsl_display_path', 'store_locator'),
-    '#description' => 'By default it will be served from /store_locator',
+    '#description' => t('By default it will be served from /store_locator'),
     '#required' => TRUE,
   );
   $form['google_store_locator']['gsl_map_long'] = array(
     '#type' => 'textfield',
-    '#title' => 'Map center point (Longitude)',
+    '#title' => t('Map center point (Longitude)'),
     '#default_value' => variable_get('gsl_map_long', '40'),
     '#required' => TRUE,
   );
   $form['google_store_locator']['gsl_map_lat'] = array(
     '#type' => 'textfield',
-    '#title' => 'Map center point (Latitude)',
+    '#title' => t('Map center point (Latitude)'),
     '#default_value' => variable_get('gsl_map_lat', '-100'),
     '#required' => TRUE,
   );
   $form['google_store_locator']['gsl_map_zoom'] = array(
     '#type' => 'textfield',
-    '#title' => 'Default zoom level',
+    '#title' => t('Default zoom level'),
     '#default_value' => variable_get('gsl_map_zoom', '4'),
     '#description' => '0-21',
     '#required' => TRUE,
