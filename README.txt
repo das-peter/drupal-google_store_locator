@@ -20,7 +20,10 @@ generates a csv file of all the location nodes you create. It provides a content
 type called 'Store Location' that is composed of addressfield and geofield
 fields. Current workflow is to add your locations as nodes of type 'Store
 Location' and then navigate to [site_name/store_locator] to see the map.
-Configuration settings can be changed at admin/configuration/google_store_locator
+Configuration settings can be changed at:
+
+admin/configuration/google_store_locator
+
 under the 'Search' heading.
 
 

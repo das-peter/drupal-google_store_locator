@@ -3,8 +3,7 @@ description = Provides a panel and map canvase for displaying your store locatio
 core = 7.x
 package = Features
 php = 5.2.4
-version = 7.x-1.0
-project = google_store_locator
+
 dependencies[] = addressfield
 dependencies[] = ctools
 dependencies[] = features
