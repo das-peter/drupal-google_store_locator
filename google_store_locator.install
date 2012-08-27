@@ -1,0 +1,19 @@
+<?php
+/**
+ * @file
+ * Install file for Google Store Locator.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function google_store_locator_uninstall() {
+  field_delete_field('gsl_addressfield');
+  field_delete_field('gsl_geofield');
+
+  variable_del('gsl_csv_path');
+  variable_del('gsl_display_path');
+  variable_del('gsl_map_long');
+  variable_del('gsl_map_lat');
+  variable_del('gsl_map_zoom');
+}
