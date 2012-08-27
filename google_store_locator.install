@@ -9,7 +9,7 @@
  */
 function google_store_locator_requirements($phase) {
   $requirements = array();
-  if ($phase == 'install') {
+  if ($phase == 'runtime') {
     $requirements['google_store_locator'] = array(
       'title' => t('Google Store Locator'),
     );
