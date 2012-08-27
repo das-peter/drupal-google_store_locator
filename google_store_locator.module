@@ -18,7 +18,7 @@ function google_store_locator_menu() {
     'title' => 'Store Locator',
     'description' => 'Store locator map using Google Store Location Library',
     'page callback' => 'google_store_locator_contents',
-    'access arguments' => array('access site-wide contact form'),
+    'access arguments' => array('access content'),
   );
   $items['admin/config/search/google_store_locator'] = array(
     'title' => 'Google Store Locator',
