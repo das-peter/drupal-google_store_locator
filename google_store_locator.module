@@ -74,7 +74,7 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#required' => TRUE,
   );
   $form = system_settings_form($form);
-  $form['#submit'][] = 'menu_rebuild';
+  $form['#submit'][] = 'google_store_locator_admin_form_submit';
   return $form;
 }
 
@@ -148,4 +148,8 @@ function google_store_locator_contents() {
   );
 
   return $output;
+}
+
+function google_store_locator_admin_form_submit() {
+  menu_rebuild();
 }
