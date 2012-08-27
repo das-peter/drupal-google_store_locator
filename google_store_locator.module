@@ -8,6 +8,7 @@ include_once 'google_store_locator.features.inc';
 
 /**
  * Implements hook_menu().
+ *
  * By using a render array as the page callback for this menu item then we
  * can give the map and panel elements as much room as possible to breathe.
  */
@@ -60,6 +61,7 @@ function google_store_locator_admin_form($form, &$form_state) {
 
 /**
  * Callback function for /store_locator in hook_menu().
+ *
  * Builds the renderable array that attaches all necessary js files to the head
  * section of the page and generates the map and panel elements.
  */

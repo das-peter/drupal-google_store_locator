@@ -45,7 +45,7 @@ INSTALLATION:
 
 CREDIT:
 1) Google and Chris Broadfoot's 'Store Locator Utility Library' screencast
-(http://www.webpronews.com/google-maps-api-introduces-store-locator-utility-library-2012-03)
+(http://tinyurl.com/8slmeln)
 
 2) Method for adding locations was borrowed from the ol_locator module with its
   'Location' content type.
