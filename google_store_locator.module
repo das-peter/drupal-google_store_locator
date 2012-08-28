@@ -58,18 +58,21 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Map center point (Longitude)'),
     '#default_value' => variable_get('gsl_map_long', '40'),
+    '#element_validate' => array('element_validate_number'),
     '#required' => TRUE,
   );
   $form['google_store_locator']['gsl_map_lat'] = array(
     '#type' => 'textfield',
     '#title' => t('Map center point (Latitude)'),
     '#default_value' => variable_get('gsl_map_lat', '-100'),
+    '#element_validate' => array('element_validate_number'),
     '#required' => TRUE,
   );
   $form['google_store_locator']['gsl_map_zoom'] = array(
     '#type' => 'textfield',
     '#title' => t('Default zoom level'),
     '#default_value' => variable_get('gsl_map_zoom', '4'),
+    '#element_validate' => array('element_validate_number'),
     '#description' => '0-21',
     '#required' => TRUE,
   );
@@ -147,23 +150,9 @@ function google_store_locator_admin_form_submit($form, &$form_state) {
  * Form validatior for google_store_locator_admin_form
  */
 function google_store_locator_admin_form_validate($form, &$form_state) {
-  if(!is_numeric($form_state['values']['gsl_map_long'])) {
-    form_set_error('gsl_map_long',
-  t('You can only enter numbers for the longitude.'));
-  }
-  if(!is_numeric($form_state['values']['gsl_map_lat'])) {
-    form_set_error('gsl_map_lat',
-  t('You can only enter numbers for the latitude.'));
-  }
-  if(!is_numeric($form_state['values']['gsl_map_zoom'])) {
+  if($form_state['values']['gsl_map_zoom'] > 21 ||
+$form_state['values']['gsl_map_zoom'] < 0) {
     form_set_error('gsl_map_zoom',
-  t('You can only enter numbers for the zoom level.'));
-  }
-  if(is_numeric($form_state['values']['gsl_map_zoom'])) {
-    if($form_state['values']['gsl_map_zoom'] > 21 ||
-  $form_state['values']['gsl_map_zoom'] < 0) {
-      form_set_error('gsl_map_zoom',
-    t('Please enter a zoom between 0 and 21.'));
-    }
+  t('Please enter a zoom level between 0 and 21.'));
   }
 }
