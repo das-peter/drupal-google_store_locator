@@ -99,25 +99,11 @@ function google_store_locator_contents() {
         'js' => array('http://maps.googleapis.com/maps/api/js?sensor=false&libraries=places', 'external'),
       ),
     ),
-
-    'google_ajax_api' => array(
-      '#attached' => array(
-        'js' => array('http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js', 'external'),
-      ),
-    ),
-
     'compiled_js' => array(
       '#attached' => array(
         'js' => array(libraries_get_path('storelocator') . '/js/store-locator.compiled.js'),
       ),
     ),
-
-    'data_feed_js' => array(
-      '#attached' => array(
-        'js' => array(drupal_get_path('module', 'google_store_locator') . '/js/data-feed.js'),
-      ),
-    ),
-
     'panel_js' => array(
       '#attached' => array(
         'js' => array(drupal_get_path('module', 'google_store_locator') . '/js/panel.js'),
