@@ -155,4 +155,14 @@ $form_state['values']['gsl_map_zoom'] < 0) {
     form_set_error('gsl_map_zoom',
   t('Please enter a zoom level between 0 and 21.'));
   }
+  if($form_state['values']['gsl_map_long'] > 180 ||
+$form_state['values']['gsl_map_long'] < -180) {
+    form_set_error('gsl_map_long',
+  t('Please enter a longitude between -180 and 180'));
+  }
+  if($form_state['values']['gsl_map_lat'] > 90 ||
+$form_state['values']['gsl_map_lat'] < -90) {
+    form_set_error('gsl_map_lat',
+  t('Please enter a latitude between -90 and 90'));
+  }
 }
