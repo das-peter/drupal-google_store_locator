@@ -16,17 +16,19 @@ function google_store_locator_requirements($phase) {
     // Verify that Google's Store Locator library is present.
     $path = libraries_get_path('storelocator');
     if (($path = libraries_get_path('storelocator'))) {
-      $requirements['google_store_locator']['value']
-    = $t('The required Store Locator library is installed.');
+      $requirements['google_store_locator']['value'] = $t(
+        'The required Store Locator library is installed.'
+      );
       $requirements['google_store_locator']['severity'] = REQUIREMENT_OK;
     }
     else {
-      $requirements['google_store_locator']['value']
-    = $t('The required Store Locator library is missing. Download it from
-          <a href="@url">http://code.google.com/p/storelocator/</a> and place it
-          in sites/all/libraries so that "index.html" is located at
-          sites/all/libraries/storelibrary/index.html',
-          array('@url' => 'http://code.google.com/p/storelocator/'));
+      $requirements['google_store_locator']['value'] = $t(
+        'The required Store Locator library is missing. Download it from
+        <a href="@url">http://code.google.com/p/storelocator/</a> and place it
+        in sites/all/libraries so that "index.html" is located at
+        sites/all/libraries/storelibrary/index.html',
+        array('@url' => 'http://code.google.com/p/storelocator/')
+      );
       $requirements['google_store_locator']['severity'] = REQUIREMENT_ERROR;
     }
   }
