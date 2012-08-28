@@ -142,3 +142,28 @@ function google_store_locator_contents() {
 function google_store_locator_admin_form_submit($form, &$form_state) {
   menu_rebuild();
 }
+
+/**
+ * Form validatior for google_store_locator_admin_form
+ */
+function google_store_locator_admin_form_validate($form, &$form_state) {
+  if(!is_numeric($form_state['values']['gsl_map_long'])) {
+    form_set_error('gsl_map_long',
+  t('You can only enter numbers for the longitude.'));
+  }
+  if(!is_numeric($form_state['values']['gsl_map_lat'])) {
+    form_set_error('gsl_map_lat',
+  t('You can only enter numbers for the latitude.'));
+  }
+  if(!is_numeric($form_state['values']['gsl_map_zoom'])) {
+    form_set_error('gsl_map_zoom',
+  t('You can only enter numbers for the zoom level.'));
+  }
+  if(is_numeric($form_state['values']['gsl_map_zoom'])) {
+    if($form_state['values']['gsl_map_zoom'] > 21 ||
+  $form_state['values']['gsl_map_zoom'] < 0) {
+      form_set_error('gsl_map_zoom',
+    t('Please enter a zoom between 0 and 21.'));
+    }
+  }
+}
