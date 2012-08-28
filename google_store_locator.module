@@ -44,7 +44,7 @@ function google_store_locator_admin_form($form, &$form_state) {
   $form['google_store_locator']['gsl_csv_path'] = array(
     '#type' => 'textfield',
     '#title' => t('Where is the CSV file located?'),
-    '#default_value' => variable_get('gsl_csv_path', 'download/location-export'),
+    '#default_value' => variable_get('gsl_csv_path', 'json-export'),
     '#required' => TRUE,
   );
   $form['google_store_locator']['gsl_display_path'] = array(
@@ -91,7 +91,7 @@ function google_store_locator_contents() {
 
   drupal_add_js(array(
     'gsl' => array(
-      'datapath' => variable_get('gsl_csv_path', 'download/location-export'),
+      'datapath' => variable_get('gsl_csv_path', 'json-export'),
       'mapzoom' => intval(variable_get('gsl_map_zoom', '4')),
       'maplong' => variable_get('gsl_map_long', '40'),
       'maplat' => variable_get('gsl_map_lat', '-100'))), 'setting');
@@ -107,9 +107,9 @@ function google_store_locator_contents() {
         'js' => array(libraries_get_path('storelocator') . '/js/store-locator.compiled.js'),
       ),
     ),
-    'panel_js' => array(
+    'build_js' => array(
       '#attached' => array(
-        'js' => array(drupal_get_path('module', 'google_store_locator') . '/js/panel.js'),
+        'js' => array(drupal_get_path('module', 'google_store_locator') . '/js/google_store_locator.js'),
       ),
     ),
 

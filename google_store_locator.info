@@ -1,9 +1,8 @@
 name = Google Store Locator
-description = Provides a panel and map canvase for displaying your store locations
+description = Provides a panel and map canvas for displaying your store locations
 core = 7.x
 package = Features
 php = 5.2.4
-
 dependencies[] = addressfield
 dependencies[] = ctools
 dependencies[] = features
@@ -12,11 +11,11 @@ dependencies[] = geofield
 dependencies[] = libraries
 dependencies[] = strongarm
 dependencies[] = views
-dependencies[] = views_data_export
+dependencies[] = views_geojson
 features[ctools][] = strongarm:strongarm:1
 features[ctools][] = views:views_default:3.0
 features[features_api][] = api:1
 features[field][] = node-store_location-gsl_addressfield
 features[field][] = node-store_location-gsl_geofield
 features[node][] = store_location
-features[views_view][] = location_export
+features[views_view][] = json_export
