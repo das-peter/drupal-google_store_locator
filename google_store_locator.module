@@ -15,14 +15,14 @@ include_once 'google_store_locator.features.inc';
 function google_store_locator_menu() {
 
   $items[variable_get('gsl_display_path', 'store_locator')] = array(
-    'title' => t('Store Locator'),
-    'description' => t('Store locator map using Google Store Location Library'),
+    'title' => 'Store Locator',
+    'description' => 'Store locator map using Google Store Location Library',
     'page callback' => 'google_store_locator_contents',
     'access arguments' => array('access content'),
   );
   $items['admin/config/search/google_store_locator'] = array(
-    'title' => t('Google Store Locator'),
-    'description' => t('Google Store Locator Settings'),
+    'title' => 'Google Store Locator',
+    'description' => 'Google Store Locator Settings',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('google_store_locator_admin_form'),
     'access arguments' => array('access administration pages'),
@@ -136,6 +136,9 @@ function google_store_locator_contents() {
   return $output;
 }
 
-function google_store_locator_admin_form_submit() {
+/**
+ * Submit callback for google_store_locator_admin_form
+ */
+function google_store_locator_admin_form_submit($form, &$form_state) {
   menu_rebuild();
 }
