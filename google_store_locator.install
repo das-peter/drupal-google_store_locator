@@ -16,8 +16,7 @@ function google_store_locator_requirements($phase) {
 
     // Verify that Google's Store Locator library is present.
     case 'runtime': {
-
-      if(!is_dir(libraries_get_path('storelocator'))) {
+      if (!is_dir(libraries_get_path('storelocator'))) {
         $requirements['google_store_locator'] = array(
           'title' => $t('Google Store Locator'),
           'description' => $t(
@@ -31,7 +30,8 @@ function google_store_locator_requirements($phase) {
         );
       }
       break;
-    }
+
+      }
   }
   return $requirements;
 }
