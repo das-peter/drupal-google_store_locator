@@ -28,31 +28,58 @@
   Drupal.GSL.dataSource.prototype.parseStores_ = function(json) {
     var stores = [];
 
-    //build all our stores
-    for (var i = 0; i < json.features.length; i++){
+    if (!('features' in json)) {
+      return;
+    }
 
-      var prefix = json.features[i];
-      var Xcoord = prefix.geometry.coordinates[0];
-      var Ycoord = prefix.geometry.coordinates[1];
-      var street_add = prefix.properties.gsl_addressfield_rendered;
-      var city = prefix.properties.gsl_addressfield_1_rendered;
-      var state = prefix.properties.gsl_addressfield_2_rendered;
-      var zip_code = prefix.properties.gsl_addressfield_3_rendered;
-      var store_id = prefix.properties.nid_rendered;
-      var store_name = prefix.properties.title_rendered;
+    // build all our stores
+    for (var i in json.features) {
+      var item = json.features[i];
 
+      // clone item properties so we can alter for features
+      var itemFeatures = ('properties' in item) ? $.extend({}, item.properties) : {};
+
+      // initialize store properties
+      var storeProps = {};
+
+      // extract coordinates
+      var Xcoord = item.geometry.coordinates[0];
+      var Ycoord = item.geometry.coordinates[1];
+
+      // create a unique id
+      var store_id = 'store_' + i;
+
+      // set title to views_geojson 'name'
+      if ('name' in itemFeatures) {
+        storeProps.title = itemFeatures.name;
+        delete itemFeatures.name;
+      }
+      else {
+        storeProps.title = store_id;
+      }
+
+      // set address to views_geojson 'description'
+      if ('description' in itemFeatures) {
+        storeProps.address = itemFeatures.description;
+        delete itemFeatures.description;
+      }
+
+      // set latitude and longitude
       var position = new google.maps.LatLng(Ycoord, Xcoord);
-      var locality = [city, state, zip_code];
-      var address = [street_add, locality.join(', ')];
 
-      //create an empty FeatureSet since features are required by storeLocator.Store()
-      var features = new storeLocator.FeatureSet;
+      // create an FeatureSet since features are required by storeLocator.Store()
+      var storeFeatureSet = new storeLocator.FeatureSet;
+      for (var prop in itemFeatures) {
+        // only add rendered features
+        if (prop.search(/_rendered$/i) > 0) {
+          var storeFeature = new storeLocator.Feature(prop, itemFeatures[prop]);
+          storeFeatureSet.add(storeFeature);
+        }
+      }
 
-      //create our new store
-      var store = new storeLocator.Store(store_id, position, features,  {
-          title: store_name,
-          address: address.join('<br>')
-        });
+
+      // create our new store
+      var store = new storeLocator.Store(store_id, position, storeFeatureSet, storeProps);
 
       stores.push(store);
     }
@@ -78,7 +105,7 @@
     var data = new Drupal.GSL.dataSource;
 
     var view = new storeLocator.View(map, data, {
-      geolocation: false,
+      geolocation: false
     });
 
     new storeLocator.Panel(panelDiv, {
