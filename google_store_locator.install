@@ -15,7 +15,7 @@ function google_store_locator_requirements($phase) {
   switch ($phase) {
 
     // Verify that Google's Store Locator library is present.
-    case 'install': {
+    case 'runtime': {
 
       if(!is_dir(libraries_get_path('storelocator'))){
         $requirements['google_store_locator'] = array(
