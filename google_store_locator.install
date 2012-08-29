@@ -20,10 +20,13 @@ function google_store_locator_requirements($phase) {
       if(!is_dir(libraries_get_path('storelocator'))){
         $requirements['google_store_locator'] = array(
         'title' => $t('Google Store Locator'),
-        'description' => $t('The required Google Store Locator library is missing.
-        Use git to clone it into your sites/all/libraries directory. The library
-        can be found <a href="@url">here</a>.',
-        array('@url' => 'http://code.google.com/p/storelocator/source/checkout')),
+        'description' => $t(
+          'The required Google Store Locator library is missing.
+          The library can be found <a href="@url">here</a>. Please add it to
+          /sites/all/libraries',
+          array(
+            '@url' => 'http://code.google.com/p/storelocator/source/checkout')
+        ),
         'severity' => REQUIREMENT_ERROR,
         );
       }
