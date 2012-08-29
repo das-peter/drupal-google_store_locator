@@ -1,35 +1,33 @@
 <?php
 /**
  * @file
- * Install file for Google Store Locator.
+ * Install, update and uninstall functions for the Google Store Locator module.
  */
 
  /**
   * Implements hook_requirements().
   */
 function google_store_locator_requirements($phase) {
+
   $requirements = array();
-  if ($phase == 'runtime') {
-    $requirements['google_store_locator'] = array(
-      'title' => $t('Google Store Locator'),
-    );
+  $t = get_t();
+
+  switch ($phase) {
+
     // Verify that Google's Store Locator library is present.
-    $path = libraries_get_path('storelocator');
-    if (($path = libraries_get_path('storelocator'))) {
-      $requirements['google_store_locator']['value'] = $t(
-        'The required Store Locator library is installed.'
-      );
-      $requirements['google_store_locator']['severity'] = REQUIREMENT_OK;
-    }
-    else {
-      $requirements['google_store_locator']['value'] = $t(
-        'The required Store Locator library is missing. Download it from
-        <a href="@url">http://code.google.com/p/storelocator/</a> and place it
-        in sites/all/libraries so that "index.html" is located at
-        sites/all/libraries/storelibrary/index.html',
-        array('@url' => 'http://code.google.com/p/storelocator/')
-      );
-      $requirements['google_store_locator']['severity'] = REQUIREMENT_ERROR;
+    case 'install': {
+
+      if(!is_dir(libraries_get_path('storelocator'))){
+        $requirements['google_store_locator'] = array(
+        'title' => $t('Google Store Locator'),
+        'description' => $t('The required Google Store Locator library is missing.
+        Use git to clone it into your sites/all/libraries directory. The library
+        can be found <a href="@url">here</a>.',
+        array('@url' => 'http://code.google.com/p/storelocator/source/checkout')),
+        'severity' => REQUIREMENT_ERROR,
+        );
+      }
+      break;
     }
   }
   return $requirements;
@@ -39,12 +37,13 @@ function google_store_locator_requirements($phase) {
  * Implements hook_uninstall().
  */
 function google_store_locator_uninstall() {
+
   field_delete_field('gsl_addressfield');
   field_delete_field('gsl_geofield');
-
   variable_del('gsl_csv_path');
   variable_del('gsl_display_path');
   variable_del('gsl_map_long');
   variable_del('gsl_map_lat');
   variable_del('gsl_map_zoom');
 }
+
