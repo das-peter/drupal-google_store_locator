@@ -29,7 +29,7 @@
     var stores = [];
 
     //build all our stores
-    for (var i=0; i < json.features.length; i++){
+    for (var i = 0; i < json.features.length; i++){
 
       var prefix = json.features[i];
       var Xcoord = prefix.geometry.coordinates[0];
