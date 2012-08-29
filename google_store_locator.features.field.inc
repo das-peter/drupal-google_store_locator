@@ -42,6 +42,8 @@ function google_store_locator_field_default_fields() {
           'label' => 'above',
           'module' => 'addressfield',
           'settings' => array(
+            'diff_custom' => 0,
+            'diff_custom_settings' => array(),
             'format_handlers' => array(
               0 => 'address',
             ),
@@ -116,6 +118,8 @@ function google_store_locator_field_default_fields() {
           'module' => 'geofield',
           'settings' => array(
             'data' => 'full',
+            'diff_custom' => 0,
+            'diff_custom_settings' => array(),
           ),
           'type' => 'geofield_wkt',
           'weight' => 1,

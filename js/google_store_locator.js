@@ -34,7 +34,12 @@
 
     // build all our stores
     for (var i in json.features) {
+
       var item = json.features[i];
+
+      if (!item) {
+        continue;
+      }
 
       // clone item properties so we can alter for features
       var itemFeatures = ('properties' in item) ? $.extend({}, item.properties) : {};
@@ -94,8 +99,8 @@
   google.maps.event.addDomListener(window, 'load', function() {
     var map = new google.maps.Map(document.getElementById('map-canvas'), {
       //Default center on North America.
-      center: new google.maps.LatLng(Drupal.settings.gsl['maplong'],
-        Drupal.settings.gsl['maplat']),
+      center: new google.maps.LatLng(Drupal.settings.gsl['maplat'],
+        Drupal.settings.gsl['maplong']),
       zoom: Drupal.settings.gsl['mapzoom'],
       mapTypeId: google.maps.MapTypeId.ROADMAP
     });

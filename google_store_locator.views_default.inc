@@ -22,16 +22,16 @@ function google_store_locator_views_default_views() {
 
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
-  $handler->display->display_options['title'] = 'JSON Feed Test';
+  $handler->display->display_options['title'] = 'Location Export';
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
-  $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'views_geojson';
-  $handler->display->display_options['style_options']['data_source']['value'] = 'geofield';
+  $handler->display->display_options['style_options']['data_source']['value'] = 'wkt';
   $handler->display->display_options['style_options']['data_source']['latitude'] = 'gsl_geofield';
   $handler->display->display_options['style_options']['data_source']['longitude'] = 'gsl_geofield';
   $handler->display->display_options['style_options']['data_source']['name_field'] = 'title';
@@ -64,7 +64,6 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['fields']['gsl_geofield']['field'] = 'gsl_geofield';
   $handler->display->display_options['fields']['gsl_geofield']['label'] = 'Coordinates';
   $handler->display->display_options['fields']['gsl_geofield']['click_sort_column'] = 'wkt';
-  $handler->display->display_options['fields']['gsl_geofield']['type'] = 'geofield_geojson';
   $handler->display->display_options['fields']['gsl_geofield']['settings'] = array(
     'data' => 'full',
   );
@@ -80,11 +79,16 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['filters']['type']['value'] = array(
     'store_location' => 'store_location',
   );
+  /* Filter criterion: Content: Published */
+  $handler->display->display_options['filters']['status']['id'] = 'status';
+  $handler->display->display_options['filters']['status']['table'] = 'node';
+  $handler->display->display_options['filters']['status']['field'] = 'status';
+  $handler->display->display_options['filters']['status']['value'] = '1';
 
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
-  $handler->display->display_options['path'] = 'json-export';
+  $handler->display->display_options['path'] = 'store-locator/json';
   $export['json_export'] = $view;
 
   return $export;

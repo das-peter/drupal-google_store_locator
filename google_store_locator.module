@@ -43,8 +43,8 @@ function google_store_locator_admin_form($form, &$form_state) {
   );
   $form['google_store_locator']['gsl_csv_path'] = array(
     '#type' => 'textfield',
-    '#title' => t('Where is the CSV file located?'),
-    '#default_value' => variable_get('gsl_csv_path', 'json-export'),
+    '#title' => t('Where is the JSON file located?'),
+    '#default_value' => variable_get('gsl_csv_path', 'store-locator/json'),
     '#required' => TRUE,
   );
   $form['google_store_locator']['gsl_display_path'] = array(
@@ -54,17 +54,17 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#description' => t('By default it will be served from /store_locator'),
     '#required' => TRUE,
   );
-  $form['google_store_locator']['gsl_map_long'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Map center point (Longitude)'),
-    '#default_value' => variable_get('gsl_map_long', '40'),
-    '#element_validate' => array('element_validate_number'),
-    '#required' => TRUE,
-  );
   $form['google_store_locator']['gsl_map_lat'] = array(
     '#type' => 'textfield',
     '#title' => t('Map center point (Latitude)'),
-    '#default_value' => variable_get('gsl_map_lat', '-100'),
+    '#default_value' => variable_get('gsl_map_lat', '40'),
+    '#element_validate' => array('element_validate_number'),
+    '#required' => TRUE,
+  );
+  $form['google_store_locator']['gsl_map_long'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Map center point (Longitude)'),
+    '#default_value' => variable_get('gsl_map_long', '-100'),
     '#element_validate' => array('element_validate_number'),
     '#required' => TRUE,
   );
@@ -91,10 +91,10 @@ function google_store_locator_contents() {
 
   drupal_add_js(array(
     'gsl' => array(
-      'datapath' => variable_get('gsl_csv_path', 'json-export'),
+      'datapath' => variable_get('gsl_csv_path', 'store-locator/json'),
       'mapzoom' => intval(variable_get('gsl_map_zoom', '4')),
-      'maplong' => variable_get('gsl_map_long', '40'),
-      'maplat' => variable_get('gsl_map_lat', '-100'))), 'setting');
+      'maplong' => variable_get('gsl_map_long', '-100'),
+      'maplat' => variable_get('gsl_map_lat', '40'))), 'setting');
 
   $output = array(
     'google_maps_api' => array(
