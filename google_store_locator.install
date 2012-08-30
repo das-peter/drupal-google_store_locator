@@ -29,14 +29,18 @@ function google_store_locator_requirements($phase) {
   return $requirements;
 }
 
+/**
+ * Implements hook_enable().
+ */
 function google_store_locator_enable() {
   $t = get_t();
   if (!is_dir(libraries_get_path('storelocator'))) {
     drupal_set_message($t('The required Google Store Locator library is missing.
     The library can be found <a href="@url">here</a>. Please add it to
     /sites/all/libraries',
-    array('@url' =>
-      'http://code.google.com/p/storelocator/source/checkout')), 'error');
+    array(
+      '@url' =>
+        'http://code.google.com/p/storelocator/source/checkout')), 'error');
   }
 }
 
