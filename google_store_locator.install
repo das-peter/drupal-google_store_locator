@@ -40,7 +40,7 @@ function google_store_locator_enable() {
     /sites/all/libraries',
     array(
       '@url' =>
-        'http://code.google.com/p/storelocator/source/checkout')), 'error');
+      'http://code.google.com/p/storelocator/source/checkout')), 'error');
   }
 }
 

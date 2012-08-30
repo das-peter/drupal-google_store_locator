@@ -16,10 +16,10 @@ simple to install and easy to use locator feature for Drupal 7.
 
 HOW IT WORKS:
 Google Store Locator creates a data feed View called 'Location Export' that
-generates a JSON file of all the location nodes you create. It provides a content
-type called 'Store Location' that is composed of addressfield and geofield
-fields. Current workflow is to add your locations as nodes of type 'Store
-Location' and then navigate to [site_name/store_locator] to see the map.
+generates a JSON file of all the location nodes you create. It provides a
+content type called 'Store Location' that is composed of addressfield and
+geofield fields. Current workflow is to add your locations as nodes of type
+'Store Location' and then navigate to [site_name/store_locator] to see the map.
 Configuration settings can be changed at:
 
   admin/Configuration/Google Store Locator
