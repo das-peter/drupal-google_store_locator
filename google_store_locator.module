@@ -17,8 +17,9 @@ function google_store_locator_menu() {
   $items[variable_get('gsl_display_path', 'store_locator')] = array(
     'title' => 'Store Locator',
     'description' => 'Store locator map using Google Store Location Library',
-    'page callback' => 'google_store_locator_contents',
+    'page callback' => 'google_store_locator_default_page',
     'access arguments' => array('access content'),
+
   );
   $items['admin/config/search/google_store_locator'] = array(
     'title' => 'Google Store Locator',
@@ -81,20 +82,42 @@ function google_store_locator_admin_form($form, &$form_state) {
   return $form;
 }
 
+
+
+
 /**
  * Callback function for /store_locator in hook_menu().
+ */
+function google_store_locator_default_page(){
+
+  $data_path = variable_get('gsl_csv_path', 'store-locator/json');
+  $map_zoom = variable_get('gsl_map_zoom', '4');
+  $map_long = variable_get('gsl_map_long', '-100');
+  $map_lat = variable_get('gsl_map_lat', '40');
+
+  return theme('google_store_locator_contents',  array(
+            'data_path' => $data_path,
+            'map_zoom' => $map_zoom,
+            'map_long' => $map_long,
+            'map_lat' =>$map_lat,
+            )
+          );
+}
+
+/**
+ * Default implementation of the google_store_locator_contents theme hook.
  *
  * Builds the renderable array that attaches all necessary js files to the head
  * section of the page and generates the map and panel elements.
  */
-function google_store_locator_contents() {
+function theme_google_store_locator_contents($variables) {
 
   drupal_add_js(array(
     'gsl' => array(
-      'datapath' => variable_get('gsl_csv_path', 'store-locator/json'),
-      'mapzoom' => intval(variable_get('gsl_map_zoom', '4')),
-      'maplong' => variable_get('gsl_map_long', '-100'),
-      'maplat' => variable_get('gsl_map_lat', '40'))), 'setting');
+      'datapath' => $variables['data_path'],
+      'mapzoom' => intval($variables['map_zoom']),
+      'maplong' => $variables['map_long'],
+      'maplat' => $variables['map_lat']),),'setting');
 
   $output = array(
     'google_maps_api' => array(
@@ -137,6 +160,24 @@ function google_store_locator_contents() {
   );
 
   return $output;
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * Registers this module's themeable functions
+ */
+function google_store_locator_theme() {
+ //returns an associative array of theme hook information.
+ return array(
+  //the outer array keys are the names of the theme functions, and the values
+  //are arrays containing information about the hook.
+   'google_store_locator_contents' => array(
+     //keys=names of the variables passed to the themable function, value=default
+     //value of the variable if none is provided.
+     'variables' => array('data_path' => NULL, 'map_zoom' => NULL, 'map_long' => NULL, 'map_lat' => NULL),
+   ),
+  );
 }
 
 /**
