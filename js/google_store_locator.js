@@ -6,19 +6,20 @@
  * @extends storeLocator.StaticDataFeed
  * @constructor
  */
-  Drupal.GSL.dataSource = function () {
-  $.extend(this, new storeLocator.StaticDataFeed);
+  Drupal.GSL.dataSource = function (datapath) {
+    $.extend(this, new storeLocator.StaticDataFeed);
 
-  var that = this;
+    var that = this;
 
-  $.getJSON(Drupal.settings.gsl['google-store-locator-map-container']['datapath'], function(json) {
+    $.getJSON(datapath, function(json) {
 
-    //defining our success handler, i.e. if the path we're passing to $.getJSON
-    //is legit and returns a JSON file then this runs.
-    var stores = that.parseStores_(json);
-    that.setStores(stores);
-  });
+      //defining our success handler, i.e. if the path we're passing to $.getJSON
+      //is legit and returns a JSON file then this runs.
+      var stores = that.parseStores_(json);
+      that.setStores(stores);
+    });
   }
+
 
 /**
  * @private
@@ -82,7 +83,6 @@
         }
       }
 
-
       // create our new store
       var store = new storeLocator.Store(store_id, position, storeFeatureSet, storeProps);
 
@@ -96,29 +96,63 @@
   /**
    * Create map on window load
    */
-  google.maps.event.addDomListener(window, 'load', function() {
-    var canvas = $('#google-store-locator-map-container .google-store-locator-map');
-    if(canvas.length) {
-      var map = new google.maps.Map(canvas.get(0), {
-        //Default center on North America.
-        center: new google.maps.LatLng(Drupal.settings.gsl['google-store-locator-map-container']['maplat'],
-          Drupal.settings.gsl['google-store-locator-map-container']['maplong']),
-        zoom: Drupal.settings.gsl['google-store-locator-map-container']['mapzoom'],
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-      });
-      alert(Drupal.settings.gsl['google-store-locator-map-container']['maplat']);
+  //google.maps.event.addDomListener(window, 'load', function() {
+  Drupal.behaviors.googleStoreLocator = {
+    attach: function (context, context_settings) {
+      for (var mapid in Drupal.settings.gsl) {
+        if (!(mapid in Drupal.settings.gsl)) {
+          continue;
+        }
 
-      var panelDiv = ($('#google-store-locator-map-container .google-store-locator-panel').get(0));
+        var $container = $('#' + mapid, context);
+        if (!$container.length) {
+          continue;
+        }
 
-      var data = new Drupal.GSL.dataSource;
+        var $canvas = $('.google-store-locator-map', $container);
+        if (!$canvas.length) {
+          continue;
+        }
 
-      var view = new storeLocator.View(map, data, {
-        geolocation: false
-      });
+        var $panel = $('.google-store-locator-panel', $container);
+        if (!$panel.length) {
+          continue;
+        }
 
-      new storeLocator.Panel(panelDiv, {
-        view: view
-      });
+        var map_settings = Drupal.settings.gsl[mapid];
+        var locator = {};
+
+        locator.data = new Drupal.GSL.dataSource(map_settings['datapath']);
+        if (!locator.data || locator.data === undefined) {
+          // @todo: show empty message
+          continue;
+        }
+
+        locator.elements = {
+          canvas: $canvas.get(0),
+          panel: $panel.get(0)
+        };
+
+        locator.map = new google.maps.Map(locator.elements.canvas, {
+          //Default center on North America.
+          center: new google.maps.LatLng(map_settings['maplat'], map_settings['maplong']),
+          zoom: map_settings['mapzoom'],
+          mapTypeId: map_settings['maptype'] || google.maps.MapTypeId.ROADMAP
+        });
+
+        locator.view = new storeLocator.View(locator.map, locator.data, {
+          geolocation: false
+        });
+
+
+        locator.panel = new storeLocator.Panel(locator.elements.panel, {
+          view: locator.view
+        });
+
+      } // /mapid loop
+
+      locator = null;
     }
-  });
+  };
+  //});
 })(jQuery);
