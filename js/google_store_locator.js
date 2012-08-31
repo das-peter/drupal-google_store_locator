@@ -119,10 +119,12 @@
           continue;
         }
 
+
         var $panel = $('.google-store-locator-panel', $container);
         if (!$panel.length) {
           continue;
         }
+
 
         var map_settings = Drupal.settings.gsl[mapid];
         var locator = {};
