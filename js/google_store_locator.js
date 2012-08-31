@@ -128,7 +128,7 @@
         var locator = {};
 
         locator.data = new Drupal.GSL.dataSource(map_settings['datapath']);
-        if (!locator.data || locator.data === undefined) {
+        if ((typeof locator.data.length == 'undefined') || !locator.data.length) {
           // @todo: show empty message
           continue;
         }
