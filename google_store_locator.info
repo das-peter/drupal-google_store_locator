@@ -18,4 +18,4 @@ features[features_api][] = api:1
 features[field][] = node-store_location-gsl_addressfield
 features[field][] = node-store_location-gsl_geofield
 features[node][] = store_location
-features[views_view][] = json_export
+features[views_view][] = google_store_locator_json_export

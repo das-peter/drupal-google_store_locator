@@ -11,7 +11,7 @@ function google_store_locator_views_default_views() {
   $export = array();
 
   $view = new view();
-  $view->name = 'json_export';
+  $view->name = 'google_store_locator_json_export';
   $view->description = '';
   $view->tag = 'default';
   $view->base_table = 'node';
@@ -31,16 +31,13 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['pager']['type'] = 'none';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'views_geojson';
-  $handler->display->display_options['style_options']['data_source'] = array(
-    'value' => 'wkt',
-    'latitude' => 'gsl_geofield',
-    'longitude' => 'gsl_geofield',
-    'geofield' => 'gsl_geofield',
-    'wkt' => 'gsl_geofield',
-    'name_field' => 'title',
-    'description_field' => 'gsl_addressfield',
-    'view_mode' => 'full',
-  );
+  $handler->display->display_options['style_options']['data_source']['value'] = 'wkt';
+  $handler->display->display_options['style_options']['data_source']['latitude'] = 'gsl_geofield';
+  $handler->display->display_options['style_options']['data_source']['longitude'] = 'gsl_geofield';
+  $handler->display->display_options['style_options']['data_source']['geofield'] = 'gsl_geofield';
+  $handler->display->display_options['style_options']['data_source']['wkt'] = 'gsl_geofield';
+  $handler->display->display_options['style_options']['data_source']['name_field'] = 'title';
+  $handler->display->display_options['style_options']['data_source']['description_field'] = 'gsl_addressfield';
   $handler->display->display_options['style_options']['jsonp_prefix'] = '';
   $handler->display->display_options['style_options']['using_views_api_mode'] = 0;
   /* Field: Content: Title */
@@ -94,7 +91,7 @@ function google_store_locator_views_default_views() {
   $handler = $view->new_display('page', 'Page', 'page');
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['path'] = 'store-locator/json';
-  $export['json_export'] = $view;
+  $export['google_store_locator_json_export'] = $view;
 
   return $export;
 }
