@@ -97,12 +97,12 @@
     return stores;
   };
 
-
   /**
    * Create map on window load
    */
   Drupal.behaviors.googleStoreLocator = {
     attach: function (context, context_settings) {
+
       // Process all maps on the page
       for (var mapid in Drupal.settings.gsl) {
         if (!(mapid in Drupal.settings.gsl)) {
@@ -129,10 +129,20 @@
         var map_settings = Drupal.settings.gsl[mapid];
         var locator = {};
 
+        // set empty message
+        if ('empty_stores_msg' in map_settings) {
+          var empty_stores_msg = map_settings['empty_stores_msg'];
+        }
+        else {
+          var empty_stores_msg = Drupal.t('There are no stores available.');
+        }
+
+        // get data
         locator.data = new Drupal.GSL.dataSource(map_settings['datapath']);
-        if ((typeof locator.data.length == 'undefined') || !locator.data.length) {
-          // @todo: show empty message
-          continue;
+
+        // @todo: determine how to find empty stores from feed
+        if (false) {
+          $panel.append('<li class="no-stores">' + empty_stores_msg + '</li>');
         }
 
         locator.elements = {

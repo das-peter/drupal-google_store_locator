@@ -133,7 +133,12 @@ function theme_google_store_locator_contents($variables) {
         'datapath' => $variables['data_path'],
         'mapzoom' => intval($variables['map_zoom']),
         'maplong' => $variables['map_long'],
-        'maplat' => $variables['map_lat']),),),'setting');
+        'maplat' => $variables['map_lat'],
+        'empty_stores_msg' => isset($variables['empty_stores_msg']) ?
+            $variables['empty_stores_msg'] :
+            t('There are no stores available.'),
+      ),
+    ),),'setting');
 
 
   if(!empty($variables['marker_path'])){
