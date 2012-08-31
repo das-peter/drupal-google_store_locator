@@ -42,10 +42,10 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#type' => 'item',
     '#title' => t('Google Store Locator'),
   );
-  $form['google_store_locator']['gsl_csv_path'] = array(
+  $form['google_store_locator']['gsl_json_path'] = array(
     '#type' => 'textfield',
     '#title' => t('Where is the JSON file located?'),
-    '#default_value' => variable_get('gsl_csv_path', 'store-locator/json'),
+    '#default_value' => variable_get('gsl_json_path', 'store-locator/json'),
     '#required' => TRUE,
   );
   $form['google_store_locator']['gsl_display_path'] = array(
@@ -90,7 +90,7 @@ function google_store_locator_admin_form($form, &$form_state) {
  */
 function google_store_locator_default_page(){
 
-  $data_path = variable_get('gsl_csv_path', 'store-locator/json');
+  $data_path = variable_get('gsl_json_path', 'store-locator/json');
   $map_zoom = variable_get('gsl_map_zoom', '4');
   $map_long = variable_get('gsl_map_long', '-100');
   $map_lat = variable_get('gsl_map_lat', '40');
@@ -111,13 +111,14 @@ function google_store_locator_default_page(){
  * section of the page and generates the map and panel elements.
  */
 function theme_google_store_locator_contents($variables) {
-
+  $gsl_map_id = drupal_html_id('google-store-locator-map-container');
   drupal_add_js(array(
     'gsl' => array(
-      'datapath' => $variables['data_path'],
-      'mapzoom' => intval($variables['map_zoom']),
-      'maplong' => $variables['map_long'],
-      'maplat' => $variables['map_lat']),),'setting');
+      $gsl_map_id => array(
+        'datapath' => $variables['data_path'],
+        'mapzoom' => intval($variables['map_zoom']),
+        'maplong' => $variables['map_long'],
+        'maplat' => $variables['map_lat']),),),'setting');
 
   $output = array(
     'google_maps_api' => array(
@@ -148,15 +149,17 @@ function theme_google_store_locator_contents($variables) {
       ),
     ),
 
-    'panel_element' => array(
+    'gsl_map_container' => array(
       '#type' => 'markup',
-      '#markup' => '<div id="panel"></div>',
-    ),
-
-    'map_element' => array(
-      '#type' => 'markup',
-      '#markup' => '<div id="map-canvas"></div>',
-    ),
+      '#prefix' => '<div id="' . $gsl_map_id . '">',
+      'gsl_panel' => array(
+        '#markup' => '<div class="google-store-locator-panel"></div>,'
+      ),
+      'gsl_map' => array(
+        '#markup' => '<div class="google-store-locator-map"></div>,'
+      ),
+      '#suffix' => '</div>',
+    )
   );
 
   return $output;

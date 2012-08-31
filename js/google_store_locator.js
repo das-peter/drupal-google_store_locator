@@ -11,14 +11,14 @@
 
   var that = this;
 
-  $.getJSON(Drupal.settings.gsl['datapath'], function(json) {
+  $.getJSON(Drupal.settings.gsl['google-store-locator-map-container']['datapath'], function(json) {
 
     //defining our success handler, i.e. if the path we're passing to $.getJSON
     //is legit and returns a JSON file then this runs.
     var stores = that.parseStores_(json);
     that.setStores(stores);
   });
-}
+  }
 
 /**
  * @private
@@ -90,32 +90,35 @@
     }
 
     return stores;
-};
+  };
 
 
   /**
    * Create map on window load
    */
   google.maps.event.addDomListener(window, 'load', function() {
-    var map = new google.maps.Map(document.getElementById('map-canvas'), {
-      //Default center on North America.
-      center: new google.maps.LatLng(Drupal.settings.gsl['maplat'],
-        Drupal.settings.gsl['maplong']),
-      zoom: Drupal.settings.gsl['mapzoom'],
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    });
+    var canvas = $('#google-store-locator-map-container .google-store-locator-map');
+    if(canvas.length) {
+      var map = new google.maps.Map(canvas.get(0), {
+        //Default center on North America.
+        center: new google.maps.LatLng(Drupal.settings.gsl['google-store-locator-map-container']['maplat'],
+          Drupal.settings.gsl['google-store-locator-map-container']['maplong']),
+        zoom: Drupal.settings.gsl['google-store-locator-map-container']['mapzoom'],
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      });
+      alert(Drupal.settings.gsl['google-store-locator-map-container']['maplat']);
 
-    var panelDiv = document.getElementById('panel');
+      var panelDiv = ($('#google-store-locator-map-container .google-store-locator-panel').get(0));
 
-    var data = new Drupal.GSL.dataSource;
+      var data = new Drupal.GSL.dataSource;
 
-    var view = new storeLocator.View(map, data, {
-      geolocation: false
-    });
+      var view = new storeLocator.View(map, data, {
+        geolocation: false
+      });
 
-    new storeLocator.Panel(panelDiv, {
-      view: view
-    });
+      new storeLocator.Panel(panelDiv, {
+        view: view
+      });
+    }
   });
-
 })(jQuery);

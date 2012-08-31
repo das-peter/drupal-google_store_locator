@@ -1,8 +1,8 @@
-#map-canvas {
+.google-store-locator-map {
   height: 500px;
 }
 
-#panel {
+.google-store-locator-panel {
   float: left;
   height: 500px;
   margin-right: 10px;
