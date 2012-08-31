@@ -20,6 +20,11 @@
     });
   }
 
+  /**
+   * Global store counter for unique ids
+   */
+  Drupal.GSL.dataSource.storeCount = 0;
+
 
 /**
  * @private
@@ -53,7 +58,7 @@
       var Ycoord = item.geometry.coordinates[1];
 
       // create a unique id
-      var store_id = 'store_' + i;
+      var store_id = 'store-' + (Drupal.GSL.dataSource.storeCount++);
 
       // set title to views_geojson 'name'
       if ('name' in itemFeatures) {
@@ -96,9 +101,9 @@
   /**
    * Create map on window load
    */
-  //google.maps.event.addDomListener(window, 'load', function() {
   Drupal.behaviors.googleStoreLocator = {
     attach: function (context, context_settings) {
+      // Process all maps on the page
       for (var mapid in Drupal.settings.gsl) {
         if (!(mapid in Drupal.settings.gsl)) {
           continue;
@@ -154,5 +159,4 @@
       locator = null;
     }
   };
-  //});
 })(jQuery);
