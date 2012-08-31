@@ -153,10 +153,10 @@ function theme_google_store_locator_contents($variables) {
       '#type' => 'markup',
       '#prefix' => '<div id="' . $gsl_map_id . '">',
       'gsl_panel' => array(
-        '#markup' => '<div class="google-store-locator-panel"></div>,'
+        '#markup' => '<div class="google-store-locator-panel"></div>'
       ),
       'gsl_map' => array(
-        '#markup' => '<div class="google-store-locator-map"></div>,'
+        '#markup' => '<div class="google-store-locator-map"></div>'
       ),
       '#suffix' => '</div>',
     )
