@@ -35,7 +35,7 @@
     var stores = [];
 
     if (!('features' in json)) {
-      return;
+      return stores;
     }
 
     // build all our stores
