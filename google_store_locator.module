@@ -204,10 +204,10 @@ function google_store_locator_theme() {
      // Keys=names of the variables passed to the themable function,
      // value=default value of the variable if none is provided.
       'variables' => array(
-      'data_path' => NULL,
-      'map_zoom' => NULL,
-      'map_long' => NULL,
-      'map_lat' => NULL,
+        'data_path' => NULL,
+        'map_zoom' => NULL,
+        'map_long' => NULL,
+        'map_lat' => NULL,
       ),
     ),
   );
