@@ -158,6 +158,7 @@
         });
 
         locator.view = new storeLocator.View(locator.map, locator.data, {
+          markerIcon: map_settings['marker_url'],
           geolocation: false
         });
 
