@@ -50,6 +50,7 @@ CREDIT:
 2) Method for adding locations was borrowed from the ol_locator module with its
   'Location' content type.
 
+3) This project was sponsored by Commerce Guys
 
 *******************************************************************************
 

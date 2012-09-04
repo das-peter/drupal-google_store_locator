@@ -135,7 +135,6 @@ function theme_google_store_locator_contents($variables) {
   $gsl_map_id = drupal_html_id('google-store-locator-map-container');
 
   $settings = array(
-<<<<<<< HEAD
     'datapath' => $variables['data_path'],
     'mapzoom' => intval($variables['map_zoom']),
     'maplong' => $variables['map_long'],
@@ -145,20 +144,7 @@ function theme_google_store_locator_contents($variables) {
     t('There are no stores available.'),
   );
 
-  if (!empty($variables['marker_path'])) {
-=======
-        'datapath' => $variables['data_path'],
-        'mapzoom' => intval($variables['map_zoom']),
-        'maplong' => $variables['map_long'],
-        'maplat' => $variables['map_lat'],
-        'empty_stores_msg' => isset($variables['empty_stores_msg']) ?
-            $variables['empty_stores_msg'] :
-            t('There are no stores available.'),
-      );
-
-
   if(!empty($variables['marker_path'])){
->>>>>>> Added soft dependency on file module for the custom marker icon
     $settings['marker_url'] = file_create_url($variables['marker_path']);
   }
   drupal_add_js(array(
