@@ -7,10 +7,13 @@
  * @constructor
  */
   Drupal.GSL.dataSource = function (datapath) {
-    $.extend(this, new storeLocator.StaticDataFeed);
+    // call the parent constructor
+    Drupal.GSL.dataSource.parent.call(this);
+
+    // initialize variables
+    this._stores = [];
 
     var that = this;
-
     $.getJSON(datapath, function(json) {
 
       //defining our success handler, i.e. if the path we're passing to $.getJSON
@@ -18,19 +21,36 @@
       var stores = that.parseStores_(json);
       that.setStores(stores);
     });
-  }
+  };
 
-  /**
-   * Global store counter for unique ids
-   */
+  // Set parent class
+  Drupal.GSL.dataSource.parent = storeLocator.StaticDataFeed;
+
+  // Inherit parent's prototyp
+  Drupal.GSL.dataSource.prototype = new Drupal.GSL.dataSource.parent;
+
+  // Correct the constructor pointer
+  Drupal.GSL.dataSource.prototype.constructor = Drupal.GSL.dataSource;
+
+  // Global store counter for unique ids
   Drupal.GSL.dataSource.storeCount = 0;
 
+  /**
+   * Overriden: Set the stores for this data feed.
+   * @param {!Array.<!storeLocator.Store>} stores  the stores for this data feed.
+   *
+   * - Sets _stores since storeLocator variable is minified
+   */
+  Drupal.GSL.dataSource.prototype.setStores = function(stores) {
+    this._stores = stores;
+    Drupal.GSL.dataSource.parent.prototype.setStores.apply(this, arguments);
+  };
 
-/**
- * @private
- * @param {object} JSON
- * @return {!Array.<!storeLocator.Store>}
- */
+  /**
+   * Parse data feed
+   * @param {object} JSON
+   * @return {!Array.<!storeLocator.Store>}
+   */
   Drupal.GSL.dataSource.prototype.parseStores_ = function(json) {
     var stores = [];
 
@@ -97,6 +117,7 @@
     return stores;
   };
 
+
   /**
    * Create map on window load
    */
@@ -161,7 +182,6 @@
           markerIcon: map_settings['marker_url'],
           geolocation: false
         });
-
 
         locator.panel = new storeLocator.Panel(locator.elements.panel, {
           view: locator.view
