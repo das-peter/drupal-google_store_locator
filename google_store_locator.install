@@ -12,17 +12,26 @@ function google_store_locator_requirements($phase) {
   $t = get_t();
   // Verify that Google's Store Locator library is present.
   if ($phase == 'runtime') {
+    drupal_load('module', 'libraries');
+
     if (!is_dir(libraries_get_path('storelocator'))) {
       $requirements['google_store_locator'] = array(
         'title' => $t('Google Store Locator'),
         'description' => $t(
         'The required Google Store Locator library is missing.
-        The library can be found <a href="@url">here</a>. Please add it to
-        /sites/all/libraries',
+        The library can be found at <a href="@url">@url</a>. Please add it to
+        your library directory.',
         array(
           '@url' => 'http://code.google.com/p/storelocator/source/checkout')
         ),
         'severity' => REQUIREMENT_ERROR,
+      );
+    }
+    else {
+      $requirements['google_store_locator'] = array(
+        'title' => $t('Google Store Locator'),
+        'severity' => REQUIREMENT_OK,
+        'value' => $t('Google Store Locator library Installed'),
       );
     }
   }
@@ -34,13 +43,15 @@ function google_store_locator_requirements($phase) {
  */
 function google_store_locator_enable() {
   $t = get_t();
+  drupal_load('module', 'libraries');
+
   if (!is_dir(libraries_get_path('storelocator'))) {
     drupal_set_message($t('The required Google Store Locator library is missing.
-    The library can be found <a href="@url">here</a>. Please add it to
-    /sites/all/libraries',
+    The library can be found at <a href="@url">@url</a>. Please add it to
+    your library directory.',
     array(
-      '@url' =>
-      'http://code.google.com/p/storelocator/source/checkout')), 'error');
+      '@url' => 'http://code.google.com/p/storelocator/source/checkout'
+    )), 'error');
   }
 }
 
