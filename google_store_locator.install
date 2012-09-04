@@ -50,7 +50,7 @@ function google_store_locator_enable() {
     The library can be found at <a href="@url">@url</a>. Please add it to
     your library directory.',
     array(
-      '@url' => 'http://code.google.com/p/storelocator/source/checkout'
+      '@url' => 'http://code.google.com/p/storelocator/source/checkout',
     )), 'error');
   }
 }

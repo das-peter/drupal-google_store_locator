@@ -78,11 +78,11 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#required' => TRUE,
   );
   $form['google_store_locator']['gsl_marker_icon'] = array(
-  '#title' => t('Marker Icon'),
-  '#type' => 'managed_file',
-  '#description' => t('The uploaded image will be displayed on this page using the image style choosen below.'),
-  '#default_value' => variable_get('gsl_marker_icon', ''),
-  '#upload_location' => 'public://gsl_marker_icon/',
+    '#title' => t('Marker Icon'),
+    '#type' => 'managed_file',
+    '#description' => t('The uploaded image will be displayed on this page using the image style choosen below.'),
+    '#default_value' => variable_get('gsl_marker_icon', ''),
+    '#upload_location' => 'public://gsl_marker_icon/',
   );
 
   $form = system_settings_form($form);
@@ -90,13 +90,10 @@ function google_store_locator_admin_form($form, &$form_state) {
   return $form;
 }
 
-
-
-
 /**
  * Callback function for /store_locator in hook_menu().
  */
-function google_store_locator_default_page(){
+function google_store_locator_default_page() {
 
   $data_path = variable_get('gsl_json_path', 'store-locator/json');
   $map_zoom = variable_get('gsl_map_zoom', '4');
@@ -107,12 +104,12 @@ function google_store_locator_default_page(){
     'data_path' => $data_path,
     'map_zoom' => $map_zoom,
     'map_long' => $map_long,
-    'map_lat' =>$map_lat,
+    'map_lat' => $map_lat,
   );
 
   $marker_icon_fid = variable_get('gsl_marker_icon', '');
 
-  if(!empty($marker_icon_fid)){
+  if (!empty($marker_icon_fid)) {
     $marker_file = file_load($marker_icon_fid);
     $variables['marker_path'] = $marker_file->uri;
   }
@@ -130,25 +127,23 @@ function theme_google_store_locator_contents($variables) {
   $gsl_map_id = drupal_html_id('google-store-locator-map-container');
 
   $settings = array(
-        'datapath' => $variables['data_path'],
-        'mapzoom' => intval($variables['map_zoom']),
-        'maplong' => $variables['map_long'],
-        'maplat' => $variables['map_lat'],
-        'empty_stores_msg' => isset($variables['empty_stores_msg']) ?
-            $variables['empty_stores_msg'] :
-            t('There are no stores available.'),
-      );
+    'datapath' => $variables['data_path'],
+    'mapzoom' => intval($variables['map_zoom']),
+    'maplong' => $variables['map_long'],
+    'maplat' => $variables['map_lat'],
+    'empty_stores_msg' => isset($variables['empty_stores_msg']) ?
+      $variables['empty_stores_msg'] :
+      t('There are no stores available.'),
+  );
 
-
-
-  if(!empty($variables['marker_path'])){
+  if (!empty($variables['marker_path'])) {
     $settings['marker_url'] = file_create_url($variables['marker_path']);
   }
   drupal_add_js(array(
     'gsl' => array(
       $gsl_map_id => $settings,
-    )
-  ),'setting');
+    ),
+  ), 'setting');
 
   $output = array(
     'google_maps_api' => array(
@@ -183,13 +178,13 @@ function theme_google_store_locator_contents($variables) {
       '#type' => 'markup',
       '#prefix' => '<div id="' . $gsl_map_id . '">',
       'gsl_panel' => array(
-        '#markup' => '<div class="google-store-locator-panel"></div>'
+        '#markup' => '<div class="google-store-locator-panel"></div>',
       ),
       'gsl_map' => array(
-        '#markup' => '<div class="google-store-locator-map"></div>'
+        '#markup' => '<div class="google-store-locator-map"></div>',
       ),
       '#suffix' => '</div>',
-    )
+    ),
   );
 
   return $output;
@@ -201,14 +196,19 @@ function theme_google_store_locator_contents($variables) {
  * Registers this module's themeable functions
  */
 function google_store_locator_theme() {
- //returns an associative array of theme hook information.
- return array(
-  //the outer array keys are the names of the theme functions, and the values
-  //are arrays containing information about the hook.
+  // Returns an associative array of theme hook information.
+  return array(
+  // The outer array keys are the names of the theme functions, and the values
+  // are arrays containing information about the hook.
    'google_store_locator_contents' => array(
-     //keys=names of the variables passed to the themable function, value=default
-     //value of the variable if none is provided.
-     'variables' => array('data_path' => NULL, 'map_zoom' => NULL, 'map_long' => NULL, 'map_lat' => NULL),
+     // Keys=names of the variables passed to the themable function,
+     // value=default value of the variable if none is provided.
+     'variables' => array(
+      'data_path' => NULL,
+      'map_zoom' => NULL,
+      'map_long' => NULL,
+      'map_lat' => NULL
+    ),
    ),
   );
 }
