@@ -203,7 +203,7 @@ function google_store_locator_theme() {
     'google_store_locator_contents' => array(
      // Keys=names of the variables passed to the themable function,
      // value=default value of the variable if none is provided.
-     'variables' => array(
+      'variables' => array(
       'data_path' => NULL,
       'map_zoom' => NULL,
       'map_long' => NULL,
