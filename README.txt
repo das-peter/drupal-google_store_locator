@@ -6,11 +6,14 @@ Maintainers: Michael Fuerstnau (michfuer), Dave Pullen (AngryWookie)
 Version: 7.x-1.x
 *******************************************************************************
 
-DESCRIPTION:
+OVERVIEW:
 This project uses Google's Store Locator Utility Library and Google Maps to
 create a 'Store Locator' page that your site visitors can use to find and get
 directions to one of your physical stores. It was born out of a need for a
-simple to install and easy to use locator feature for Drupal 7.
+simple to install and easy to use locator feature for Drupal 7. This module is
+different from other 'locator' type modules (e.g. OpenLayers Locator) in that
+it doesn't require you to have any knowledge of it's dependant modules, and
+since it's focused on
 
 *******************************************************************************
 
@@ -24,7 +27,8 @@ Configuration settings can be changed at:
 
   admin/Configuration/Google Store Locator
 
-under the 'Search' heading.
+under the 'Search' heading. Note: giving the map and panel displays the full
+Content region (no sidebar blocks) produces better visual results.
 
 
 *******************************************************************************
@@ -43,12 +47,12 @@ INSTALLATION:
 
 *******************************************************************************
 
-CREDIT:
+CREDITS:
 1) Google and Chris Broadfoot's 'Store Locator Utility Library' screencast
 (http://tinyurl.com/8slmeln)
 
-2) Method for adding locations was borrowed from the ol_locator module with its
-  'Location' content type.
+2) Method for adding locations was borrowed from the OpenLayers Locator module
+   with its 'Location' content type.
 
 3) This project was sponsored by Commerce Guys
 
