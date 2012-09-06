@@ -83,11 +83,11 @@ function google_store_locator_admin_form($form, &$form_state) {
 
   if (module_exists('file')) {
     $form['google_store_locator']['gsl_marker_icon'] = array(
-    '#title' => t('Marker Icon'),
-    '#type' => 'managed_file',
-    '#description' => t('The uploaded image will be displayed as the store location icon in the map.'),
-    '#default_value' => variable_get('gsl_marker_icon', ''),
-    '#upload_location' => 'public://gsl_marker_icon/',
+      '#title' => t('Marker Icon'),
+      '#type' => 'managed_file',
+      '#description' => t('The uploaded image will be displayed as the store location icon in the map.'),
+      '#default_value' => variable_get('gsl_marker_icon', ''),
+      '#upload_location' => 'public://gsl_marker_icon/',
     );
   }
   else {
