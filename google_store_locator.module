@@ -38,6 +38,7 @@ function google_store_locator_menu() {
  * Create admin form for Google Store Locator.
  */
 function google_store_locator_admin_form($form, &$form_state) {
+
   $form['description'] = array(
     '#type' => 'item',
     '#title' => t('Google Store Locator'),
@@ -79,7 +80,8 @@ function google_store_locator_admin_form($form, &$form_state) {
   );
 
   $file_path = drupal_get_path('module', 'file');
-  if(module_exists('file')){
+
+  if (module_exists('file')) {
     $form['google_store_locator']['gsl_marker_icon'] = array(
     '#title' => t('Marker Icon'),
     '#type' => 'managed_file',
@@ -88,7 +90,7 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#upload_location' => 'public://gsl_marker_icon/',
     );
   }
-  else{
+  else {
     $form['google_store_locator']['gsl_marker_icon'] = array(
       '#markup' => t("<h6>To enable the custom marker icon feature please install the file module</h6>"),
     );
@@ -119,6 +121,7 @@ function google_store_locator_default_page() {
 
   if (!empty($marker_icon_fid)) {
     $marker_file = file_load($marker_icon_fid);
+
     $variables['marker_path'] = $marker_file->uri;
   }
 
@@ -144,7 +147,7 @@ function theme_google_store_locator_contents($variables) {
     t('There are no stores available.'),
   );
 
-  if(!empty($variables['marker_path'])){
+  if (!empty($variables['marker_path'])) {
     $settings['marker_url'] = file_create_url($variables['marker_path']);
   }
   drupal_add_js(array(

@@ -2,7 +2,8 @@
                    DRUPAL MODULE
 *******************************************************************************
 Name: Google Store Locator
-Maintainers: Michael Fuerstnau (michfuer), Dave Pullen (AngryWookie)
+Maintainers: Michael Fuerstnau (michfuer), Dave Pullen (AngryWookie), Michael
+             Vanetta (recrit)
 Version: 7.x-1.x
 *******************************************************************************
 
@@ -12,8 +13,9 @@ create a 'Store Locator' page that your site visitors can use to find and get
 directions to one of your physical stores. It was born out of a need for a
 simple to install and easy to use locator feature for Drupal 7. This module is
 different from other 'locator' type modules (e.g. OpenLayers Locator) in that
-it doesn't require you to have any knowledge of it's dependant modules, and
-since it's focused on
+it doesn't require you to have any knowledge of it's dependant modules, and it
+allows developers to focus on implementing personal customizations quickly
+because the installation process is so light.
 
 *******************************************************************************
 
