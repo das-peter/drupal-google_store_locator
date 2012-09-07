@@ -26,7 +26,7 @@ function google_store_locator_menu() {
     'description' => 'Google Store Locator Settings',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('google_store_locator_admin_form'),
-    'access arguments' => array('access administration pages'),
+    'access arguments' => array('administer site configuration'),
     'type' => MENU_NORMAL_ITEM,
     'menu_name' => 'management',
     'weight' => 1,
@@ -92,7 +92,7 @@ function google_store_locator_admin_form($form, &$form_state) {
   }
   else {
     $form['google_store_locator']['gsl_marker_icon'] = array(
-      '#markup' => t("<h6>To enable the custom marker icon feature please install the file module</h6>"),
+      '#markup' => '<h6>' . t('To enable the custom marker icon feature please install the file module') . '</h6>',
     );
   }
   $form = system_settings_form($form);
@@ -121,7 +121,6 @@ function google_store_locator_default_page() {
 
   if (!empty($marker_icon_fid)) {
     $marker_file = file_load($marker_icon_fid);
-
     $variables['marker_path'] = $marker_file->uri;
   }
 
