@@ -32,6 +32,13 @@ Configuration settings can be changed at:
 under the 'Search' heading. Note: giving the map and panel displays the full
 Content region (no sidebar blocks) produces better visual results.
 
+Some map items you can change by editing the view 'Location Export':
+
+ Map sidebar: Title - GeoJSON Feed Settings, currently set to the node title
+ Map sidebar: Description - GeoJSON Feed Settings, currently set to the address field but you could create a combined views field that had both in a rewrite.
+ Map location callout: any remaining views field that is not set to GeoJSON Feed Settings title or description
+
+
 
 *******************************************************************************
 
@@ -45,6 +52,7 @@ INSTALLATION:
      -addressfield
      -geocoder
         -geoPHP
+     -strongarm
 
 
 *******************************************************************************
