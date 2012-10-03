@@ -158,7 +158,7 @@ function theme_google_store_locator_contents($variables) {
   $output = array(
     'google_maps_api' => array(
       '#attached' => array(
-        'js' => array('http://maps.googleapis.com/maps/api/js?sensor=false&libraries=places', 'external'),
+        'js' => array('http://maps.googleapis.com/maps/api/js?sensor=false&libraries=places' => array('type' => 'external')),
       ),
     ),
     'compiled_js' => array(
