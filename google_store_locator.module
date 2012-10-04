@@ -146,6 +146,10 @@ function theme_google_store_locator_contents($variables) {
     t('There are no stores available.'),
   );
 
+  if (!empty($variables['items_per_panel'])) {
+    $settings['items_per_panel'] = $variables['items_per_panel'];
+  }
+
   if (!empty($variables['marker_path'])) {
     $settings['marker_url'] = file_create_url($variables['marker_path']);
   }

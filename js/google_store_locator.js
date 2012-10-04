@@ -118,6 +118,86 @@
   };
 
 
+/**
+ * @extends storeLocator.Panel
+ * @constructor
+ */
+  Drupal.GSL.Panel = function (el, opt_options) {
+    // set the parent on the instance
+    this.parent = Drupal.GSL.Panel.parent;
+
+    // set items per panel
+    if (opt_options['items_per_panel'] && !isNaN(opt_options['items_per_panel'])) {
+      this.set('items_per_panel', opt_options['items_per_panel']);
+    }
+    else {
+      // use default items per panel
+      this.set('items_per_panel', Drupal.GSL.Panel.ITEMS_PER_PANEL_DEFAULT);
+    }
+
+    // call the parent constructor
+    this.parent.call(this, el, opt_options);
+
+    // ensure this variable is set
+    this.storeList_ = $('.store-list', el);
+  };
+
+  // Set parent class
+  Drupal.GSL.Panel.parent = storeLocator.Panel;
+
+  // Inherit parent's prototyp
+  Drupal.GSL.Panel.prototype = Drupal.GSL.Panel.parent.prototype;
+
+  // Correct the constructor pointer
+  Drupal.GSL.Panel.prototype.constructor = Drupal.GSL.Panel;
+
+  Drupal.GSL.Panel.ITEMS_PER_PANEL_DEFAULT = 10;
+
+  /**
+   * Overridden storeLocator.Panel.prototype.stores_changed
+   */
+  Drupal.GSL.Panel.prototype.stores_changed = function() {
+    if (!this.get('stores')) {
+      return;
+    }
+
+    var view = this.get('view');
+    var bounds = view && view.getMap().getBounds();
+
+    var that = this;
+    var stores = this.get('stores');
+    var selectedStore = this.get('selectedStore');
+    this.storeList_.empty();
+
+    if (!stores.length) {
+      this.storeList_.append(Drupal.GSL.Panel.parent.NO_STORES_HTML_);
+    } else if (bounds && !bounds.contains(stores[0].getLocation())) {
+      this.storeList_.append(Drupal.GSL.Panel.parent.NO_STORES_IN_VIEW_HTML_);
+    }
+
+    var clickHandler = function() {
+      view.highlight(this['store'], true);
+    };
+
+    // Add stores to list
+    var items_per_panel = this.get('items_per_panel');
+    for (var i = 0, ii = Math.min(items_per_panel, stores.length); i < ii; i++) {
+      var storeLi = stores[i].getInfoPanelItem();
+      storeLi['store'] = stores[i];
+      if (selectedStore && stores[i].getId() == selectedStore.getId()) {
+        $(storeLi).addClass('highlighted');
+      }
+
+      if (!storeLi.clickHandler_) {
+        storeLi.clickHandler_ = google.maps.event.addDomListener(
+            storeLi, 'click', clickHandler);
+      }
+
+      that.storeList_.append(storeLi);
+    }
+  };
+
+
   /**
    * Create map on window load
    */
@@ -170,8 +250,9 @@
           geolocation: false
         });
 
-        locator.panel = new storeLocator.Panel(locator.elements.panel, {
-          view: locator.view
+        locator.panel = new Drupal.GSL.Panel(locator.elements.panel, {
+          view: locator.view,
+          items_per_panel: map_settings['items_per_panel']
         });
 
       } // /mapid loop
