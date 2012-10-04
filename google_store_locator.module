@@ -56,6 +56,14 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#description' => t('By default it will be served from /store_locator'),
     '#required' => TRUE,
   );
+  $form['google_store_locator']['items_per_panel'] = array(
+    '#type' => 'textfield',
+    '#title' => t('How many stores should show in the panel?'),
+    '#description' => t('The panel shows the X closest locations where X is the value entered above.'),
+    '#default_value' => variable_get('items_per_panel', '10'),
+    '#element_validate' => array('element_validate_integer_positive'),
+    '#required' => TRUE,
+  );
   $form['google_store_locator']['gsl_map_lat'] = array(
     '#type' => 'textfield',
     '#title' => t('Map center point (Latitude)'),
@@ -109,12 +117,14 @@ function google_store_locator_default_page() {
   $map_zoom = variable_get('gsl_map_zoom', '4');
   $map_long = variable_get('gsl_map_long', '-100');
   $map_lat = variable_get('gsl_map_lat', '40');
+  $items_per_panel = variable_get('items_per_panel', 10);
 
   $variables = array(
     'data_path' => $data_path,
     'map_zoom' => $map_zoom,
     'map_long' => $map_long,
     'map_lat' => $map_lat,
+    'items_per_panel' => $items_per_panel,
   );
 
   $marker_icon_fid = variable_get('gsl_marker_icon', '');
