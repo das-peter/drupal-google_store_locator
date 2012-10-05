@@ -197,6 +197,14 @@
     }
   };
 
+  //Initialize variable for
+  Drupal.GSL.currentMap = {};
+
+  Drupal.GSL.setCurrentMap = function(map, mapid) {
+    Drupal.GSL.currentMap = map;
+    Drupal.GSL.currentMap.mapid = mapid;
+  }
+
 
   /**
    * Create map on window load
@@ -244,6 +252,8 @@
           zoom: map_settings['mapzoom'],
           mapTypeId: map_settings['maptype'] || google.maps.MapTypeId.ROADMAP
         });
+
+        Drupal.GSL.setCurrentMap(locator.map, mapid);
 
         locator.view = new storeLocator.View(locator.map, locator.data, {
           markerIcon: map_settings['marker_url'],
