@@ -66,4 +66,17 @@ function google_store_locator_uninstall() {
   variable_del('gsl_map_long');
   variable_del('gsl_map_lat');
   variable_del('gsl_map_zoom');
+  variable_del('gsl_marker_icon');
+  variable_del('gsl_items_per_panel');
+  variable_del('gsl_loc_aware');
+  variable_del('gsl_loc_aware_zoom');
+}
+
+/**
+ * Implements hook_update_N
+ * @param type $sandbox
+ *
+ */
+function google_store_locator_update_7100(&$sandbox){
+  variable_set('gsl_items_per_panel', variable_get('items_per_panel'));
 }
