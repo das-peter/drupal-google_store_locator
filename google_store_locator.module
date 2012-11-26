@@ -283,6 +283,20 @@ function google_store_locator_theme() {
  * Submit callback for google_store_locator_admin_form.
  */
 function google_store_locator_admin_form_submit($form, &$form_state) {
+  if ($form['google_store_locator']['gsl_marker_icon']['#default_value'] != 0) {
+    if ($form['google_store_locator']['gsl_marker_icon']['#default_value'] != $form_state['values']['gsl_marker_icon']) {
+      $old_file = file_load($form['google_store_locator']['gsl_marker_icon']['#default_value']);
+      file_delete($old_file);
+    }
+  }
+  if ($form_state['values']['gsl_marker_icon'] != 0) {
+    // Load the file via file.fid.
+    $file = file_load($form_state['values']['gsl_marker_icon']);
+    // Change status to permanent.
+    $file->status = FILE_STATUS_PERMANENT;
+    // Save.
+    file_save($file);
+  }
   menu_rebuild();
   $form_state['redirect'] = variable_get('gsl_display_path', 'store_locator');
 }
