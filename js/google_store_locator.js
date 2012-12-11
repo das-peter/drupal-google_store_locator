@@ -262,7 +262,8 @@
 
         locator.panel = new Drupal.GSL.Panel(locator.elements.panel, {
           view: locator.view,
-          items_per_panel: map_settings['items_per_panel']
+          items_per_panel: map_settings['items_per_panel'],
+          locationSearchLabel: map_settings['search_label']
         });
 
       } // /mapid loop
