@@ -147,7 +147,7 @@ function google_store_locator_admin_form($form, &$form_state) {
         ':input[name="gsl_loc_aware"]' => array('checked' => TRUE)),
       'required' => array(
         ':input[name="gsl_loc_aware"]' => array('checked' => TRUE)),
-    )
+    ),
   );
 
   $file_path = drupal_get_path('module', 'file');
@@ -198,14 +198,28 @@ function google_store_locator_default_page() {
 
   $marker_icon_fid = variable_get('gsl_marker_icon', '');
 
-  //add the zoom setting if location awareness is enabled.
-  if($loc_aware == '1') {
+  // Add the zoom setting if location awareness is enabled.
+  if ($loc_aware == '1') {
     $variables['loc_aware_zoom'] = variable_get('gsl_loc_aware_zoom');
   }
 
   if (!empty($marker_icon_fid)) {
     $marker_file = file_load($marker_icon_fid);
     $variables['marker_path'] = $marker_file->uri;
+  }
+
+  // Add the feature list if some exist.
+  $feature_field = field_info_field('field_feature_filter_list');
+  if (isset($feature_field)) {
+    $feature_list = list_allowed_values($feature_field);
+    if (!empty($feature_list)) {
+      // Need to sanitize the keys and labels returned from
+      // list_allowed_values().
+      foreach ($feature_list as $key => $label) {
+        $skey = field_filter_xss($key);
+        $variables['feature_list'][$skey] = field_filter_xss($label);
+      }
+    }
   }
 
   return theme('google_store_locator_contents', $variables);
@@ -226,9 +240,7 @@ function theme_google_store_locator_contents($variables) {
     'maplong' => $variables['map_long'],
     'maplat' => $variables['map_lat'],
     'search_label' => $variables['search_label'],
-    'empty_stores_msg' => isset($variables['empty_stores_msg']) ?
-    $variables['empty_stores_msg'] :
-    t('There are no stores available.'),
+    'empty_stores_msg' => isset($variables['empty_stores_msg']) ? $variables['empty_stores_msg'] : t('There are no stores available.'),
   );
 
   if (!empty($variables['items_per_panel'])) {
@@ -237,6 +249,10 @@ function theme_google_store_locator_contents($variables) {
 
   if (!empty($variables['marker_path'])) {
     $settings['marker_url'] = file_create_url($variables['marker_path']);
+  }
+
+  if (!empty($variables['feature_list'])) {
+    $settings['feature_list'] = $variables['feature_list'];
   }
 
   $output = array(
@@ -280,14 +296,14 @@ function theme_google_store_locator_contents($variables) {
     ),
   );
 
-  //Add the location awareness js if it's enabled.
-  if(!empty($variables['loc_aware'])) {
+  // Add the location awareness js if it's enabled.
+  if (!empty($variables['loc_aware'])) {
     $output['loc_aware_js'] = array(
       '#attached' => array(
         'js' => array(drupal_get_path('module', 'google_store_locator') . '/js/google_store_locator_loc_aware.js'),
-      )
+      ),
     );
-    $settings['loc_aware_zoom'] = (int)$variables['loc_aware_zoom'];
+    $settings['loc_aware_zoom'] = (int) $variables['loc_aware_zoom'];
   }
 
   drupal_add_js(array(
@@ -350,11 +366,11 @@ function google_store_locator_admin_form_submit($form, &$form_state) {
  */
 function google_store_locator_admin_form_validate($form, &$form_state) {
 
-  //Force 'gsl_loc_aware_zoom' to pass #element_validate if gsl_loc_aware isn't enabled
-  if(!empty($form_state['values']['gsl_loc_aware'])) {
-    if(empty($form_state['values']['gsl_loc_aware_zoom'])){
-      form_set_error('gsl_loc_aware_zoom',
-    t('With Location Awareness enabled you must enter a zoom level!'));
+  // Force 'gsl_loc_aware_zoom' to pass #element_validate if gsl_loc_aware
+  // isn't enabled.
+  if (!empty($form_state['values']['gsl_loc_aware'])) {
+    if (empty($form_state['values']['gsl_loc_aware_zoom'])) {
+      form_set_error('gsl_loc_aware_zoom', t('With Location Awareness enabled you must enter a zoom level!'));
     }
   }
 

@@ -59,7 +59,7 @@ function google_store_locator_enable() {
  * Implements hook_install().
  */
 function google_store_locator_install() {
- $fields = array();
+  $fields = array();
 
   // Exported field: 'node-store_location-gsl_addressfield'.
   $fields['node-store_location-gsl_addressfield'] = array(
@@ -226,7 +226,7 @@ function google_store_locator_install() {
     ),
   );
 
-  foreach($fields as $field) {
+  foreach ($fields as $field) {
     // Look for existing field.
     $field_config = field_info_field($field['field_config']['field_name']);
     if (empty($field_config)) {
@@ -239,7 +239,6 @@ function google_store_locator_install() {
     }
   }
 }
-
 
 /**
  * Implements hook_uninstall().
@@ -257,15 +256,8 @@ function google_store_locator_uninstall() {
 }
 
 /**
- * Implements hook_update_N
- * @param type $sandbox
- *
+ * Implements hook_update_N().
  */
-function google_store_locator_update_7100(&$sandbox){
+function google_store_locator_update_7100(&$sandbox) {
   variable_set('gsl_items_per_panel', variable_get('items_per_panel'));
 }
-
-/**
- * TODO: need to add an updated function for the two fields gsl_addressfield and
- * gsl_geofield you've added.
- */
