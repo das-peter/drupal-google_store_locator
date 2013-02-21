@@ -13,3 +13,11 @@
 .google-store-locator-map img {
   max-width: none !important;
 }
+
+.storelocator-panel .feature-filter {
+  overflow: visible;
+}
+
+.storelocator-panel .store-list {
+  clear: both;
+}

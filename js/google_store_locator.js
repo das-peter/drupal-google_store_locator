@@ -26,7 +26,7 @@
   // Set parent class
   Drupal.GSL.dataSource.parent = storeLocator.StaticDataFeed;
 
-  // Inherit parent's prototyp
+  // Inherit parent's prototype
   Drupal.GSL.dataSource.prototype = new Drupal.GSL.dataSource.parent;
 
   // Correct the constructor pointer
@@ -37,7 +37,7 @@
 
   /**
    * Overriden: Set the stores for this data feed.
-   * @param {!Array.<!storeLocator.Store>} stores  the stores for this data feed.
+   * @param {!Array.<!storeLocator.Store>} stores the stores for this data feed.
    *
    * - Sets _stores since storeLocator variable is minified
    */
@@ -157,7 +157,7 @@
   // Set parent class
   Drupal.GSL.Panel.parent = storeLocator.Panel;
 
-  // Inherit parent's prototyp
+  // Inherit parent's prototype
   Drupal.GSL.Panel.prototype = Drupal.GSL.Panel.parent.prototype;
 
   // Correct the constructor pointer
