@@ -43,11 +43,15 @@ Some map items you can change by editing the view 'Location Export':
 
 
 ADD STORE FEATURE FILTER LIST:
-The Store Location content type has a field labeled Feature Filter List. This
+  The Store Location content type has a field labeled Feature Filter List. This
 is the field an admin can edit to add or remove store features (e.g. Open 24hrs,
 Sells Product X). Add the potential features a store can have in the 'Allowed
 values list' following the required format.
-
+  Edit your store locations and mark the checkboxes next to each feature that
+store possesses.
+  That's it! The panel portion of the store locator will now have a checkbox
+filter for each feature you've added. When your customers use your locator they
+will be able to filter the stores displayed based on the features each one has.
 
 
 *******************************************************************************
