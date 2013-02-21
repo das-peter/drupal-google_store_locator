@@ -56,9 +56,12 @@ function google_store_locator_enable() {
 }
 
 /**
- * Implements hook_install().
+ * Place we put the field config and instance arrays.
+ *
+ * @return array
+ *   The fields and their instances this module creates.
  */
-function google_store_locator_install() {
+function google_store_locator_installed_fields() {
   $fields = array();
 
   // Exported field: 'node-store_location-gsl_addressfield'.
@@ -226,6 +229,80 @@ function google_store_locator_install() {
     ),
   );
 
+  // Exported field: 'node-store_location-field_feature_filter_list'.
+  $fields['node-store_location-field_feature_filter_list'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '-1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'gsl_feature_filter_list',
+      'foreign keys' => array(),
+      'indexes' => array(
+        'value' => array(
+          0 => 'value',
+        ),
+      ),
+      'locked' => '0',
+      'module' => 'list',
+      'settings' => array(
+        'allowed_values' => array(
+          'gensel' => ' Opa Gensel',
+          'rusty' => ' Open Rusty',
+        ),
+        'allowed_values_function' => '',
+        'profile2_private' => FALSE,
+      ),
+      'translatable' => '0',
+      'type' => 'list_text',
+    ),
+    'field_instance' => array(
+      'bundle' => 'store_location',
+      'default_value' => NULL,
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'list',
+          'settings' => array(),
+          'type' => 'list_default',
+          'weight' => 4,
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'gsl_feature_filter_list',
+      'label' => 'Feature Filter List',
+      'required' => 0,
+      'settings' => array(
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'options',
+        'settings' => array(),
+        'type' => 'options_buttons',
+        'weight' => '4',
+      ),
+    ),
+  );
+
+  return $fields;
+}
+
+/**
+ * Implements hook_install().
+ */
+function google_store_locator_install() {
+
+  $fields = google_store_locator_installed_fields();
+
   foreach ($fields as $field) {
     // Look for existing field.
     $field_config = field_info_field($field['field_config']['field_name']);
@@ -260,4 +337,24 @@ function google_store_locator_uninstall() {
  */
 function google_store_locator_update_7100(&$sandbox) {
   variable_set('gsl_items_per_panel', variable_get('items_per_panel'));
+}
+
+/**
+ * A hook update that adds the Feature Filter List field.
+ */
+function google_store_locator_update_7101() {
+
+  $fields = google_store_locator_installed_fields();
+  // Look for existing field.
+  $field_config = field_info_field('gsl_feature_filter_list');
+  if (empty($field_config)) {
+    field_create_field($fields['node-store_location-field_feature_filter_list']['field_config']);
+  }
+  // Look for existing instance.
+  $instance = field_info_instance($fields['node-store_location-field_feature_filter_list']['field_instance']['entity_type'], $fields['node-store_location-field_feature_filter_list']['field_config']['field_name'], $fields['node-store_location-field_feature_filter_list']['field_instance']['bundle']);
+  if (empty($instance)) {
+    field_create_instance($fields['node-store_location-field_feature_filter_list']['field_instance']);
+  }
+
+  return t('Feature Filter List field has been added to the Store Location content type');
 }
