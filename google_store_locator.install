@@ -246,11 +246,6 @@ function google_store_locator_installed_fields() {
       'locked' => '0',
       'module' => 'list',
       'settings' => array(
-        'allowed_values' => array(
-          'gensel' => ' Opa Gensel',
-          'rusty' => ' Open Rusty',
-        ),
-        'allowed_values_function' => '',
         'profile2_private' => FALSE,
       ),
       'translatable' => '0',

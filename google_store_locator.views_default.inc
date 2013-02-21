@@ -69,6 +69,11 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['fields']['gsl_geofield']['settings'] = array(
     'data' => 'full',
   );
+  /* Field: Content: Feature Filter List */
+  $handler->display->display_options['fields']['gsl_feature_filter_list']['id'] = 'gsl_feature_filter_list';
+  $handler->display->display_options['fields']['gsl_feature_filter_list']['table'] = 'field_data_gsl_feature_filter_list';
+  $handler->display->display_options['fields']['gsl_feature_filter_list']['field'] = 'gsl_feature_filter_list';
+  $handler->display->display_options['fields']['gsl_feature_filter_list']['delta_offset'] = '0';
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -91,6 +96,22 @@ function google_store_locator_views_default_views() {
   $handler = $view->new_display('page', 'Page', 'page');
   $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
   $handler->display->display_options['path'] = 'store-locator/json';
+  $translatables['google_store_locator_json_export'] = array(
+    t('Master'),
+    t('Location Export'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Store Name'),
+    t('Street Address'),
+    t('[gsl_addressfield-thoroughfare]'),
+    t('Coordinates'),
+    t('Feature Filter List'),
+    t('Page'),
+  );
   $export['google_store_locator_json_export'] = $view;
 
   return $export;
