@@ -103,7 +103,7 @@
       for (var prop in itemFeatures) {
         // only add rendered features
         if (prop.search(/_rendered$/i) > 0) {
-          if(prop == "field_feature_filter_list_rendered" && itemFeatures[prop]) {
+          if(prop == "gsl_feature_filter_list_rendered" && itemFeatures[prop]) {
             // It's a non-empty feature filter list. We need to create an id and
             // display name for it. It will be coming in as a comma separated
             // string.

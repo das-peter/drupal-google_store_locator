@@ -209,7 +209,7 @@ function google_store_locator_default_page() {
   }
 
   // Add the feature list if some exist.
-  $feature_field = field_info_field('field_feature_filter_list');
+  $feature_field = field_info_field('gsl_feature_filter_list');
   if (isset($feature_field)) {
     $feature_list = list_allowed_values($feature_field);
     if (!empty($feature_list)) {
