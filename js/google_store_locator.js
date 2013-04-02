@@ -102,31 +102,30 @@
       var storeFeatureSet = new storeLocator.FeatureSet;
       for (var prop in itemFeatures) {
         // only add rendered features
-        if (prop.search(/_rendered$/i) > 0) {
-          if(prop == "gsl_feature_filter_list_rendered" && itemFeatures[prop]) {
-            // It's a non-empty feature filter list. We need to create an id and
-            // display name for it. It will be coming in as a comma separated
-            // string.
-            var list = itemFeatures[prop].split(',');
-            for(var j = 0; j < list.length; j++) {
-              // Go through each feature and add it.
-              var label = list[j].trim();
-              // Generate the id from the label by getting rid of all the
-              // whitespace in it.
-              var id = label.replace(/\s/g,'');
-              var storeFeature = new storeLocator.Feature(id, label);
-              storeFeatureSet.add(storeFeature);
-            }
+        if (prop.search(/_rendered$/i) > 0 && itemFeatures[prop]) {
+          switch(prop) {
+            case "gsl_feature_filter_list_rendered":
+              // It's a non-empty feature filter list. We need to create an id and
+              // display name for it. It will be coming in as a comma separated
+              // string.
+              var list = itemFeatures[prop].split(',');
+              for(var j = 0; j < list.length; j++) {
+                // Go through each feature and add it.
+                var label = list[j].trim();
+                // Generate the id from the label by getting rid of all the
+                // whitespace in it.
+                var id = label.replace(/\s/g,'');
+                var storeFeature = new storeLocator.Feature(id, label);
+                storeFeatureSet.add(storeFeature);
+              }
+              break;
           }
         }
       }
-
       // create our new store
       var store = new storeLocator.Store(store_id, position, storeFeatureSet, storeProps);
-
       stores.push(store);
     }
-
     return stores;
   };
 
@@ -135,9 +134,6 @@
  * @constructor
  */
   Drupal.GSL.Panel = function (el, opt_options) {
-    // set the parent on the instance
-    this.parent = Drupal.GSL.Panel.parent;
-
     // set items per panel
     if (opt_options['items_per_panel'] && !isNaN(opt_options['items_per_panel'])) {
       this.set('items_per_panel', opt_options['items_per_panel']);
@@ -147,21 +143,19 @@
       this.set('items_per_panel', Drupal.GSL.Panel.ITEMS_PER_PANEL_DEFAULT);
     }
 
-    // call the parent constructor
-    this.parent.call(this, el, opt_options);
+    // call the parent constructor (in compiled format)
+    storeLocator.Panel.call(this, el, opt_options);
 
     // ensure this variable is set
     this.storeList_ = $('.store-list', el);
   };
 
-  // Set parent class
-  Drupal.GSL.Panel.parent = storeLocator.Panel;
-
-  // Inherit parent's prototype
-  Drupal.GSL.Panel.prototype = Drupal.GSL.Panel.parent.prototype;
-
-  // Correct the constructor pointer
-  Drupal.GSL.Panel.prototype.constructor = Drupal.GSL.Panel;
+  // When we create a new object of type Drupal.GSL.Panel that object will
+  // inherit all the properties of it's constructor prototype i.e.
+  // Drupal.GSL.Panel.prototype. Thus we need to properly set the prototype.
+  // Object.create() creates a new object with the specified prototype object
+  // and properties.
+  Drupal.GSL.Panel.prototype = Object.create(storeLocator.Panel.prototype);
 
   Drupal.GSL.Panel.ITEMS_PER_PANEL_DEFAULT = 10;
 
@@ -206,6 +200,43 @@
       }
 
       that.storeList_.append(storeLi);
+    }
+  };
+
+  /**
+   * Overridden storeLocator.Panel.prototype.selectedStore_changed
+   */
+  Drupal.GSL.Panel.prototype.selectedStore_changed = function() {
+    // Call the parent method in the context of this object using 'this'.
+    storeLocator.Panel.prototype.selectedStore_changed.call(this);
+
+    // Remember that this method runs on the initial map build. Then it runs
+    // again when you select a store in the panel. We only care about the latter
+    // event for disabling the Street View link.
+
+    // We use store to determine if it's the initial map build or the 'select a
+    // store' in the panel event. We only care about the event.
+    var store = this.get('selectedStore');
+    if (store) {
+      // At this point all the links are added to the selected store. We should
+      // first check that the Street View imagery exists: if no then disable the
+      // link.
+
+      // Create a StreetViewService object that we use to check if the Street
+      // View imagery associated with the selected store is available.
+      var sv = new google.maps.StreetViewService();
+      // We're gonna limit the search for imagery to 50 meters.
+      sv.getPanoramaByLocation(store.getLocation(),  50, function(data, status) {
+        if (status != google.maps.StreetViewStatus.OK) {
+
+          $("a[class='action streetview']").after($('<span>').attr({
+            'class': 'action streetview',
+            'style': 'color:#C9C9C9'
+          }).html($("a[class='action streetview']").text()));
+
+          $("a[class='action streetview']").remove();
+        }
+      });
     }
   };
 
