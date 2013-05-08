@@ -34,8 +34,6 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['style_options']['data_source']['value'] = 'wkt';
   $handler->display->display_options['style_options']['data_source']['latitude'] = 'gsl_geofield';
   $handler->display->display_options['style_options']['data_source']['longitude'] = 'gsl_geofield';
-  $handler->display->display_options['style_options']['data_source']['geofield'] = 'gsl_geofield';
-  $handler->display->display_options['style_options']['data_source']['wkt'] = 'gsl_geofield';
   $handler->display->display_options['style_options']['data_source']['name_field'] = 'title';
   $handler->display->display_options['style_options']['data_source']['description_field'] = 'gsl_addressfield';
   $handler->display->display_options['style_options']['jsonp_prefix'] = '';
@@ -74,6 +72,18 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['fields']['gsl_feature_filter_list']['table'] = 'field_data_gsl_feature_filter_list';
   $handler->display->display_options['fields']['gsl_feature_filter_list']['field'] = 'gsl_feature_filter_list';
   $handler->display->display_options['fields']['gsl_feature_filter_list']['delta_offset'] = '0';
+  /* Field: Content: Misc. Properties */
+  $handler->display->display_options['fields']['gsl_props_misc']['id'] = 'gsl_props_misc';
+  $handler->display->display_options['fields']['gsl_props_misc']['table'] = 'field_data_gsl_props_misc';
+  $handler->display->display_options['fields']['gsl_props_misc']['field'] = 'gsl_props_misc';
+  /* Field: Content: Store Phone */
+  $handler->display->display_options['fields']['gsl_props_phone']['id'] = 'gsl_props_phone';
+  $handler->display->display_options['fields']['gsl_props_phone']['table'] = 'field_data_gsl_props_phone';
+  $handler->display->display_options['fields']['gsl_props_phone']['field'] = 'gsl_props_phone';
+  /* Field: Content: Store Website */
+  $handler->display->display_options['fields']['gsl_props_web']['id'] = 'gsl_props_web';
+  $handler->display->display_options['fields']['gsl_props_web']['table'] = 'field_data_gsl_props_web';
+  $handler->display->display_options['fields']['gsl_props_web']['field'] = 'gsl_props_web';
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -110,6 +120,9 @@ function google_store_locator_views_default_views() {
     t('[gsl_addressfield-thoroughfare]'),
     t('Coordinates'),
     t('Feature Filter List'),
+    t('Misc. Properties'),
+    t('Store Phone'),
+    t('Store Website'),
     t('Page'),
   );
   $export['google_store_locator_json_export'] = $view;
