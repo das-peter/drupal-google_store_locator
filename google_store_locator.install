@@ -288,6 +288,152 @@ function google_store_locator_installed_fields() {
     ),
   );
 
+  $fields['gsl_props_misc'] = array(
+    'field_config' => array(
+      'translatable' => '0',
+      'settings' => array(
+        'profile2_private' => FALSE,
+      ),
+      'field_name' => 'gsl_props_misc',
+      'type' => 'text_long',
+      'active' => '1',
+      'locked' => '0',
+      'cardinality' => '1',
+    ),
+    'field_instance' => array(
+      'label' => 'Misc. Properties',
+      'widget' => array(
+        'weight' => '5',
+        'type' => 'text_textarea',
+        'active' => 1,
+        'settings' => array(
+          'rows' => '7',
+        ),
+      ),
+      'settings' => array(
+        'text_processing' => '0',
+        'user_register_form' => FALSE,
+      ),
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'type' => 'text_default',
+          'settings' => array(),
+          'weight' => 5,
+        ),
+        'teaser' => array(
+          'type' => 'hidden',
+          'label' => 'above',
+          'settings' => array(),
+          'weight' => 0,
+        ),
+      ),
+      'required' => 0,
+      'description' => '',
+      'default_value' => NULL,
+      'field_name' => 'gsl_props_misc',
+      'entity_type' => 'node',
+      'bundle' => 'store_location',
+    ),
+  );
+  $fields['gsl_props_phone'] = array(
+    'field_config' => array(
+      'translatable' => '0',
+      'settings' => array(
+        'max_length' => '255',
+        'profile2_private' => FALSE,
+      ),
+      'field_name' => 'gsl_props_phone',
+      'type' => 'text',
+      'active' => '1',
+      'locked' => '0',
+      'cardinality' => '1',
+    ),
+    'field_instance' => array(
+      'label' => 'Store Phone',
+      'widget' => array(
+        'weight' => '6',
+        'type' => 'text_textfield',
+        'active' => 1,
+        'settings' => array(
+          'size' => '25',
+        ),
+      ),
+      'settings' => array(
+        'text_processing' => '0',
+        'user_register_form' => FALSE,
+      ),
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'type' => 'text_default',
+          'settings' => array(),
+          'weight' => 6,
+        ),
+        'teaser' => array(
+          'type' => 'hidden',
+          'label' => 'above',
+          'settings' => array(),
+          'weight' => 0,
+        ),
+      ),
+      'required' => 0,
+      'description' => '',
+      'default_value' => NULL,
+      'field_name' => 'gsl_props_phone',
+      'entity_type' => 'node',
+      'bundle' => 'store_location',
+    ),
+  );
+  $fields['gsl_props_web'] = array(
+    'field_config' => array(
+      'translatable' => '0',
+      'settings' => array(
+        'max_length' => '255',
+        'profile2_private' => FALSE,
+      ),
+      'field_name' => 'gsl_props_web',
+      'type' => 'text',
+      'active' => '1',
+      'locked' => '0',
+      'cardinality' => '1',
+    ),
+    'field_instance' => array(
+      'label' => 'Store Website',
+      'widget' => array(
+        'weight' => '7',
+        'type' => 'text_textfield',
+        'active' => 1,
+        'settings' => array(
+          'size' => '60',
+        ),
+      ),
+      'settings' => array(
+        'text_processing' => '0',
+        'user_register_form' => FALSE,
+      ),
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'type' => 'text_default',
+          'settings' => array(),
+          'weight' => 7,
+        ),
+        'teaser' => array(
+          'type' => 'hidden',
+          'label' => 'above',
+          'settings' => array(),
+          'weight' => 0,
+        ),
+      ),
+      'required' => 0,
+      'description' => '',
+      'default_value' => NULL,
+      'field_name' => 'gsl_props_web',
+      'entity_type' => 'node',
+      'bundle' => 'store_location',
+    ),
+  );
   return $fields;
 }
 
