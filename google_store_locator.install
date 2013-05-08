@@ -499,3 +499,26 @@ function google_store_locator_update_7101() {
 
   return t('Feature Filter List field has been added to the Store Location content type');
 }
+
+/**
+ * Adds phone, web, and misc. fields to the Store Location content type.
+ */
+function google_store_locator_update_7102() {
+
+  $fields = google_store_locator_installed_fields();
+
+  foreach ($fields as $field) {
+    // Look for existing field.
+    $field_config = field_info_field($field['field_config']['field_name']);
+    if (empty($field_config)) {
+      field_create_field($field['field_config']);
+    }
+    // Look for existing instance.
+    $instance = field_info_instance($field['field_instance']['entity_type'], $field['field_config']['field_name'], $field['field_instance']['bundle']);
+    if (empty($instance)) {
+      field_create_instance($field['field_instance']);
+    }
+  }
+
+  return t('Phone, web, and misc. fields have been added to the Store Location content type.');
+}
