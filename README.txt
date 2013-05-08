@@ -57,7 +57,8 @@ will be able to filter the stores displayed based on the features each one has.
 *******************************************************************************
 
 INSTALLATION:
-1) Use git to clone the 'storelocator' library into sites/all/libraries
+1) Use git to clone the 'storelocator' library into /sites/all/libraries. Path
+   should read /sites/all/libraries/storelocator.
 (http://code.google.com/p/storelocator/source/checkout)
 
 2) Download and enable the module and all dependencies. Required modules are:
