@@ -47,11 +47,10 @@ function google_store_locator_node_info() {
 function google_store_locator_menu() {
 
   $items[variable_get('gsl_display_path', 'store_locator')] = array(
-    'title' => 'Store Locator',
+    'title' => variable_get('gsl_title', 'Store Locator'),
     'description' => 'Store locator map using Google Store Location Library',
     'page callback' => 'google_store_locator_default_page',
     'access arguments' => array('access content'),
-
   );
   $items['admin/config/search/google_store_locator'] = array(
     'title' => 'Google Store Locator',
@@ -73,19 +72,14 @@ function google_store_locator_admin_form($form, &$form_state) {
 
   $form['description'] = array(
     '#type' => 'item',
-    '#title' => t('Google Store Locator'),
+    '#title' => t('Google Store Locator Administrator Settings'),
   );
-  $form['google_store_locator']['gsl_json_path'] = array(
+  $form['google_store_locator']['gsl_title'] = array(
     '#type' => 'textfield',
-    '#title' => t('Where is the JSON file located?'),
-    '#default_value' => variable_get('gsl_json_path', 'store-locator/json'),
-    '#required' => TRUE,
-  );
-  $form['google_store_locator']['gsl_display_path'] = array(
-    '#type' => 'textfield',
-    '#title' => t('What is the desired path for the store locator?'),
-    '#default_value' => variable_get('gsl_display_path', 'store_locator'),
-    '#description' => t('By default it will be served from /store_locator'),
+    '#title' => t('What should the title be?'),
+    '#description' => t('The title for your locator'),
+    '#default_value' => variable_get('gsl_title', 'Store Locator'),
+    '#size' => 30,
     '#required' => TRUE,
   );
   $form['google_store_locator']['gsl_search_label'] = array(
@@ -107,7 +101,7 @@ function google_store_locator_admin_form($form, &$form_state) {
   );
   $form['google_store_locator']['gsl_map_lat'] = array(
     '#type' => 'textfield',
-    '#title' => t('Map center point (Latitude)'),
+    '#title' => t('Default Map center point (Latitude)'),
     '#default_value' => variable_get('gsl_map_lat', '40'),
     '#size' => 5,
     '#element_validate' => array('element_validate_number'),
@@ -115,7 +109,7 @@ function google_store_locator_admin_form($form, &$form_state) {
   );
   $form['google_store_locator']['gsl_map_long'] = array(
     '#type' => 'textfield',
-    '#title' => t('Map center point (Longitude)'),
+    '#title' => t('Default Map center point (Longitude)'),
     '#default_value' => variable_get('gsl_map_long', '-100'),
     '#size' => 5,
     '#element_validate' => array('element_validate_number'),
@@ -130,27 +124,6 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#description' => t('Enter a value from 0-21 with 0 being the farthest distance from the earth'),
     '#required' => TRUE,
   );
-  $form['google_store_locator']['gsl_loc_aware'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable Map with Location Awareness'),
-    '#description' => t('This allows users to share their location via the browser, and then center the map view on that location'),
-    '#default_value' => variable_get('gsl_loc_aware', FALSE),
-  );
-  $form['google_store_locator']['gsl_loc_aware_zoom'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Set Location Awareness Zoom Level'),
-    '#element_validate' => array('element_validate_integer'),
-    '#size' => 5,
-    '#default_value' => variable_get('gsl_loc_aware_zoom', NULL),
-    '#states' => array(
-      'visible' => array(
-        ':input[name="gsl_loc_aware"]' => array('checked' => TRUE)),
-      'required' => array(
-        ':input[name="gsl_loc_aware"]' => array('checked' => TRUE)),
-    ),
-  );
-
-  $file_path = drupal_get_path('module', 'file');
 
   if (module_exists('file')) {
     $form['google_store_locator']['gsl_marker_icon'] = array(
@@ -166,6 +139,49 @@ function google_store_locator_admin_form($form, &$form_state) {
       '#markup' => '<h6>' . t('To enable the custom marker icon feature please install the file module') . '</h6>',
     );
   }
+
+  // We put all advanced features into a fieldset.
+  $form['google_store_locator']['advanced'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Advanced settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['google_store_locator']['advanced']['gsl_json_path'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Path to Store Location data'),
+    '#description' => t("Warning: by default this points to the Location Export View which provides the Store data in the proper JSON format. Do not change this path unless you're sure it points to a properly formatted source."),
+    '#default_value' => variable_get('gsl_json_path', 'store-locator/json'),
+    '#required' => TRUE,
+  );
+  $form['google_store_locator']['advanced']['gsl_display_path'] = array(
+    '#type' => 'textfield',
+    '#title' => t('What is the desired path for the store locator?'),
+    '#default_value' => variable_get('gsl_display_path', 'store_locator'),
+    '#description' => t('By default it will be served from /store_locator'),
+    '#required' => TRUE,
+  );
+  $form['google_store_locator']['advanced']['gsl_loc_aware'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Map with Location Awareness'),
+    '#description' => t('This allows users to share their location via the browser, and then center the map view on that location'),
+    '#default_value' => variable_get('gsl_loc_aware', FALSE),
+  );
+  $form['google_store_locator']['advanced']['gsl_loc_aware_zoom'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Set Location Awareness Zoom Level'),
+    '#description' => t('Enter a value from 0-21 with 0 being the farthest distance from the earth'),
+    '#element_validate' => array('element_validate_integer'),
+    '#size' => 5,
+    '#default_value' => variable_get('gsl_loc_aware_zoom', NULL),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="gsl_loc_aware"]' => array('checked' => TRUE)),
+      'required' => array(
+        ':input[name="gsl_loc_aware"]' => array('checked' => TRUE)),
+    ),
+  );
+
   $form = system_settings_form($form);
   $form['#submit'][] = 'google_store_locator_admin_form_submit';
 
