@@ -119,16 +119,20 @@
                 storeFeatureSet.add(storeFeature);
               }
               break;
+
             case "gsl_props_misc_rendered":
               storeProps.misc = itemFeatures.gsl_props_misc_rendered;
               break;
+
             case "gsl_props_phone_rendered":
               storeProps.phone = itemFeatures.gsl_props_phone_rendered;
               break;
+
             case "gsl_props_web_rendered":
               var url = itemFeatures.gsl_props_web_rendered.split(',');
               storeProps.web = '<a href="' + url[1] + '">' + url[0] + '</a>';
               break;
+
           }
         }
       }
