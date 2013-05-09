@@ -462,6 +462,9 @@ function google_store_locator_install() {
  * Implements hook_uninstall().
  */
 function google_store_locator_uninstall() {
+  // Delete all the variables we set with system_settings_form().
+  variable_del('gsl_search_label');
+  variable_del('gsl_title');
   variable_del('gsl_json_path');
   variable_del('gsl_display_path');
   variable_del('gsl_map_long');
@@ -471,6 +474,17 @@ function google_store_locator_uninstall() {
   variable_del('gsl_items_per_panel');
   variable_del('gsl_loc_aware');
   variable_del('gsl_loc_aware_zoom');
+
+  //Load the modules GSL is dependent on in case they've been disabled.
+  drupal_load('module', 'addressfield');
+  drupal_load('module', 'geofield');
+
+  $fields = google_store_locator_installed_fields();
+  foreach ($fields as $field) {
+    field_delete_field($field['field_config']['field_name']);
+  }
+  field_purge_batch(10);
+
 }
 
 /**
