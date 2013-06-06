@@ -62,12 +62,12 @@ INSTALLATION:
 (http://code.google.com/p/storelocator/source/checkout)
 
 2) Download and enable the module and all dependencies. Required modules are:
-     -views_geojson
-     -geofield
-     -addressfield
-     -geocoder
-        -geoPHP
-     -strongarm
+    -addressfield
+    -geocoder
+    -geofield
+    -libraries
+    -views
+    -views_geojson
 
 
 *******************************************************************************
