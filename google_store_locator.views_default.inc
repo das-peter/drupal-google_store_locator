@@ -31,9 +31,13 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['pager']['type'] = 'none';
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['style_plugin'] = 'views_geojson';
-  $handler->display->display_options['style_options']['data_source']['value'] = 'wkt';
+  $handler->display->display_options['style_options']['data_source']['value'] = 'geofield';
   $handler->display->display_options['style_options']['data_source']['latitude'] = 'gsl_geofield';
   $handler->display->display_options['style_options']['data_source']['longitude'] = 'gsl_geofield';
+  $handler->display->display_options['style_options']['data_source']['bbox_top'] = 'title';
+  $handler->display->display_options['style_options']['data_source']['bbox_right'] = 'title';
+  $handler->display->display_options['style_options']['data_source']['bbox_bottom'] = 'title';
+  $handler->display->display_options['style_options']['data_source']['bbox_left'] = 'title';
   $handler->display->display_options['style_options']['data_source']['name_field'] = 'title';
   $handler->display->display_options['style_options']['data_source']['description_field'] = 'gsl_addressfield';
   $handler->display->display_options['style_options']['jsonp_prefix'] = '';
