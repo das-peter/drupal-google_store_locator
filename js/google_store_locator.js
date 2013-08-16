@@ -12,15 +12,7 @@
 
     // initialize variables
     this._stores = [];
-
-    var that = this;
-    $.getJSON(datapath, function(json) {
-
-      //defining our success handler, i.e. if the path we're passing to $.getJSON
-      //is legit and returns a JSON file then this runs.
-      var stores = that.parseStores_(json);
-      that.setStores(stores);
-    });
+    this._datapath = datapath;
   };
 
   // Set parent class
@@ -31,6 +23,77 @@
 
   // Correct the constructor pointer
   Drupal.GSL.dataSource.prototype.constructor = Drupal.GSL.dataSource;
+
+  Drupal.GSL.dataSource.prototype.getStores = function(bounds, features, callback) {
+
+    var markerClusterEnabled = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapcluster'];
+    var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
+    var switchToMarkerCluster = (Drupal.GSL.currentMap.getZoom() < markerClusterZoom);
+    var viewportEnabled = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['viewportManage'];
+    var viewportMarkerLimit = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['viewportMarkerLimit'];
+    var viewportNoMarkers = (Drupal.GSL.currentMap.getZoom() < viewportMarkerLimit);
+
+    if ((markerClusterEnabled && switchToMarkerCluster && !$.isEmptyObject(Drupal.GSL.currentCluster)) || (viewportEnabled && viewportNoMarkers)) {
+      // Once cluster has been initialized we don't even need to fetch data, or
+      // if Viewport is enabled, and the map zoom is less then the viewport zoom
+      // limit.
+      return;
+    }
+
+    if (!viewportEnabled) {
+      // Viewport marker management isn't enabled. We're gonna load all the
+      // stores.
+      var url = this._datapath;
+    }
+    else {
+      // Marker management is enabled. Load only some of the stores.
+      var swPoint = bounds.getSouthWest();
+      var nePoint = bounds.getNorthEast();
+
+      var swLat = swPoint.lat();
+      var swLng = swPoint.lng();
+      var neLat = nePoint.lat();
+      var neLng = nePoint.lng();
+      if (swLat < neLat) {
+        var latRange = swLat + '--' + neLat;
+      }
+      else {
+        // This case is never triggered since the Google Map doesn't allow you to revolve vertically
+        var latRange = swLat + '--90+-90--' + neLat;
+      }
+      if (swLng < neLng) {
+        var lonRange = swLng + '--' + neLng;
+      }
+      else {
+        var lonRange = swLng + '--180+-180--' + neLng;
+      }
+
+      var url = this._datapath + '/' + latRange + '/' + lonRange;
+    }
+
+    var that = this;
+    // Loading all stores can take a while, display a loading overlay.
+    if ($("#cluster-loading").length == 0) {
+      $('#' + Drupal.GSL.currentMap.mapid).append('<div id="cluster-loading" class="ajax-progress ajax-progress-throbber"><div>' + Drupal.t('Loading') + '<span class="throbber"></span></div></div>');
+    }
+
+    $.getJSON(url, function(json) {
+      //defining our success handler, i.e. if the path we're passing to $.getJSON
+      //is legit and returns a JSON file then this runs.
+      var markerClusterEnabled = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapcluster'];
+      var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
+      var switchToMarkerCluster = (Drupal.GSL.currentMap.getZoom() < markerClusterZoom);
+      var stores = that.parseStores_(json);
+      $("#cluster-loading").remove();
+      that.setStores(stores);
+      if (markerClusterEnabled && switchToMarkerCluster) {
+        if ($.isEmptyObject(Drupal.GSL.currentCluster)) {
+          Drupal.GSL.initializeCluster(stores, that);
+        }
+      }
+      callback(stores);
+    });
+  };
 
   // Global store counter for unique ids
   Drupal.GSL.dataSource.storeCount = 0;
@@ -256,10 +319,23 @@
 
   //Initialize variable for
   Drupal.GSL.currentMap = {};
+  Drupal.GSL.currentCluster = {};
 
   Drupal.GSL.setCurrentMap = function(map, mapid) {
     Drupal.GSL.currentMap = map;
     Drupal.GSL.currentMap.mapid = mapid;
+  }
+
+  /**
+   * Create the marker cluster.
+   */
+  Drupal.GSL.initializeCluster = function (stores, that) {
+    var map = Drupal.GSL.currentMap;
+    var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
+    var markerClusterGrid = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclustergrid'];
+    var mcOptions = {gridSize: markerClusterGrid, maxZoom: markerClusterZoom - 1};
+    // We populate it later in addStoreToMap().
+    Drupal.GSL.currentCluster = new MarkerClusterer(map, [], mcOptions);
   }
 
   /**
@@ -331,6 +407,31 @@
           locationSearchLabel: map_settings['search_label']
         });
 
+        // Override addStoreToMap() to implement marker cluster.
+        locator.view.addStoreToMap = function(store) {
+          var marker = this.getMarker(store);
+          store.setMarker(marker);
+          var that = this;
+
+          marker.clickListener_ = google.maps.event.addListener(marker, 'click',
+            function() {
+              that.highlight(store, false);
+            });
+
+          if (marker.getMap() != this.getMap()) {
+            var markerClusterEnabled = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapcluster'];
+            var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
+            var switchToMarkerCluster = (Drupal.GSL.currentMap.getZoom() < markerClusterZoom);
+            if (markerClusterEnabled && switchToMarkerCluster) {
+              // Marker is added to the cluster.
+              Drupal.GSL.currentCluster.addMarker(marker);
+            }
+            else {
+              // Marker is added directly to the map.
+              marker.setMap(this.getMap());
+            }
+          }
+        };
       } // mapid loop
 
       locator = null;

@@ -181,6 +181,87 @@ function google_store_locator_admin_form($form, &$form_state) {
         ':input[name="gsl_loc_aware"]' => array('checked' => TRUE)),
     ),
   );
+  $form['google_store_locator']['advanced']['gsl_loc_aware'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Map with Location Awareness'),
+    '#description' => t('This allows users to share their location via the browser, and then center the map view on that location'),
+    '#default_value' => variable_get('gsl_loc_aware', FALSE),
+  );
+  $form['google_store_locator']['advanced']['gsl_map_cluster'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable marker clustering'),
+    '#default_value' => variable_get('gsl_map_cluster', FALSE),
+    '#description' => t("WARNING: Using this option alone won't necessarily improve performance when viewing >1k markers. To improve performance use this in conjunction with Viewport Marker Management. (see the README.txt)"),
+  );
+  $markerclusterer_exist = (file_exists(libraries_get_path('markerclusterer') . '/src/markerclusterer_compiled.js'));
+  if (!$markerclusterer_exist) {
+    $form['google_store_locator']['advanced']['gsl_map_cluster']['#value'] = FALSE;
+    $form['google_store_locator']['advanced']['gsl_map_cluster']['#disabled'] = TRUE;
+    $form['google_store_locator']['advanced']['gsl_map_cluster']['#description'] = t('Marker Clusterer library is missing. see !reports', array('!reports' => l(t('reports'), 'admin/reports/status')));
+  }
+  $form['google_store_locator']['advanced']['gsl_map_cluster_grid'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Cluster Grid size'),
+    '#description' => t('The grid size of a cluster in pixels.'),
+    '#element_validate' => array('element_validate_integer'),
+    '#size' => 5,
+    '#default_value' => variable_get('gsl_map_cluster_grid', 50),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="gsl_map_cluster"]' => array('checked' => TRUE)),
+      'required' => array(
+        ':input[name="gsl_map_cluster"]' => array('checked' => TRUE)),
+    ),
+  );
+
+  $form['google_store_locator']['advanced']['gsl_cluster_zoom_limit'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Cluster Zoom limit'),
+    '#description' => t('The zoom level at which clusters are no longer displayed.') . '<br />' .
+    t('Enter a value from 0-21 with 0 being the farthest distance from the earth'),
+    '#element_validate' => array('element_validate_integer'),
+    '#size' => 5,
+    '#default_value' => variable_get('gsl_cluster_zoom_limit', 10),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="gsl_map_cluster"]' => array('checked' => TRUE)),
+      'required' => array(
+        ':input[name="gsl_map_cluster"]' => array('checked' => TRUE)),
+    ),
+  );
+
+  // Create the Viewport marker management element
+  $form['google_store_locator']['advanced']['gsl_viewport'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Viewport Marker Management'),
+    '#default_value' => variable_get('gsl_viewport', FALSE),
+    '#description' => t("Recommended for performance if number of stores is >1k"),
+  );
+
+  // If not all dependencies are met then disable.
+  $contextual_module_enabled = module_exists('contextual_range_filter');
+  if(!$contextual_module_enabled) {
+    $form['google_store_locator']['advanced']['gsl_viewport']['#value'] = FALSE;
+    $form['google_store_locator']['advanced']['gsl_viewport']['#disabled'] = TRUE;
+    $form['google_store_locator']['advanced']['gsl_viewport']['#description'] = t('Must download and enable Views Contextual Range Filter module. see !reports', array('!reports' => l(t('reports'), 'admin/reports/status')));
+  }
+
+  // If marker management is enabled then we need to capture zoom limit.
+  $form['google_store_locator']['advanced']['gsl_marker_zoom_limit'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Marker Zoom limit'),
+    '#description' => t('The maximum zoom level that markers will be displayed.') . '<br />' .
+    t('Enter a value from 0-21 with 0 being the farthest distance from the earth'),
+    '#element_validate' => array('element_validate_integer'),
+    '#size' => 5,
+    '#default_value' => variable_get('gsl_marker_zoom_limit', 10),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="gsl_viewport"]' => array('checked' => TRUE)),
+      'required' => array(
+        ':input[name="gsl_viewport"]' => array('checked' => TRUE)),
+    ),
+  );
 
   $form = system_settings_form($form);
   $form['#submit'][] = 'google_store_locator_admin_form_submit';
@@ -196,6 +277,11 @@ function google_store_locator_default_page() {
 
   $data_path = variable_get('gsl_json_path', 'store-locator/json');
   $map_zoom = variable_get('gsl_map_zoom', '4');
+  $map_cluster= variable_get('gsl_map_cluster', FALSE);
+  $map_cluster_grid= variable_get('gsl_map_cluster_grid', 50);
+  $map_cluster_zoom_limit = variable_get('gsl_cluster_zoom_limit', 10);
+  $viewport_manage = variable_get('gsl_viewport', FALSE);
+  $viewport_marker_limit = variable_get('gsl_marker_zoom_limit', 10);
   $map_long = variable_get('gsl_map_long', '-100');
   $map_lat = variable_get('gsl_map_lat', '40');
   $items_per_panel = variable_get('gsl_items_per_panel', 10);
@@ -205,6 +291,11 @@ function google_store_locator_default_page() {
   $variables = array(
     'data_path' => $data_path,
     'map_zoom' => $map_zoom,
+    'map_cluster' => $map_cluster,
+    'map_cluster_grid' => $map_cluster_grid,
+    'map_cluster_zoom' => $map_cluster_zoom_limit,
+    'viewport_manage' => $viewport_manage,
+    'viewport_marker_limit' => $viewport_marker_limit,
     'map_long' => $map_long,
     'map_lat' => $map_lat,
     'items_per_panel' => $items_per_panel,
@@ -253,6 +344,11 @@ function theme_google_store_locator_contents($variables) {
   $settings = array(
     'datapath' => $variables['data_path'],
     'mapzoom' => intval($variables['map_zoom']),
+    'mapcluster' => intval($variables['map_cluster']),
+    'mapclusterzoom' => intval($variables['map_cluster_zoom']),
+    'mapclustergrid' => intval($variables['map_cluster_grid']),
+    'viewportManage' => $variables['viewport_manage'],
+    'viewportMarkerLimit' => intval($variables['viewport_marker_limit']),
     'maplong' => $variables['map_long'],
     'maplat' => $variables['map_lat'],
     'search_label' => $variables['search_label'],
@@ -312,6 +408,11 @@ function theme_google_store_locator_contents($variables) {
     ),
   );
 
+  $markerclusterer_path = libraries_get_path('markerclusterer');
+  if ($markerclusterer_path) {
+    $output['compiled_js']['#attached']['js'][] = $markerclusterer_path . '/src/markerclusterer_compiled.js';
+  }
+
   // Add the location awareness js if it's enabled.
   if (!empty($variables['loc_aware'])) {
     $output['loc_aware_js'] = array(
@@ -333,8 +434,6 @@ function theme_google_store_locator_contents($variables) {
 
 /**
  * Implements hook_theme().
- *
- * Registers this module's themeable functions
  */
 function google_store_locator_theme() {
   // Returns an associative array of theme hook information.
@@ -347,8 +446,19 @@ function google_store_locator_theme() {
       'variables' => array(
         'data_path' => NULL,
         'map_zoom' => NULL,
+        'map_cluster' => NULL,
+        'map_cluster_grid' => NULL,
+        'map_cluster_zoom' => NULL,
+        'viewport_manage' => NULL,
+        'viewport_marker_limit' => NULL,
         'map_long' => NULL,
         'map_lat' => NULL,
+        'items_per_panel' => NULL,
+        'loc_aware' => NULL,
+        'loc_aware_zoom' => NULL,
+        'search_label' => NULL,
+        'marker_path' => NULL,
+        'feature_list' => NULL,
       ),
     ),
   );

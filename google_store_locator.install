@@ -10,11 +10,11 @@
 function google_store_locator_requirements($phase) {
   $requirements = array();
   $t = get_t();
-  // Verify that Google's Store Locator library is present.
   if ($phase == 'runtime') {
     drupal_load('module', 'libraries');
 
     if (!is_dir(libraries_get_path('storelocator'))) {
+      // Verify that Google's Store Locator library is present.
       $requirements['google_store_locator'] = array(
         'title' => $t('Google Store Locator'),
         'description' => $t(
@@ -34,6 +34,50 @@ function google_store_locator_requirements($phase) {
         'value' => $t('Google Store Locator library Installed'),
       );
     }
+    if (!is_dir(libraries_get_path('markerclusterer'))) {
+      // Verify that the Marker Clusterer library is present.
+      $requirements['marker_clusterer'] = array(
+        'title' => $t('Marker Clusterer'),
+        'description' => $t(
+        'The Marker Clusterer library is missing, and is required to enable
+          the marker clustering option.
+        The library can be found at <a href="@url">@url</a>. Please add it to
+        your library directory.',
+        array(
+          '@url' => 'http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer')
+        ),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+    else {
+      $requirements['marker_clusterer'] = array(
+        'title' => $t('Marker Clusterer'),
+        'severity' => REQUIREMENT_OK,
+        'value' => $t('Marker Clusterer library Installed'),
+      );
+    }
+    if (!module_exists('contextual_range_filter')) {
+      // Verify that the Views Contextual Range Filter module is present.
+      $requirements['contextual_range_filter'] = array(
+        'title' => $t('Views Contextual Range Filter'),
+        'description' => $t(
+        'The Views Contextual Range Filter is required to enable Viewport Marker
+          Management. The module can be found at <a href="@url">@url</a>. Please
+          download and enable it.',
+        array(
+          '@url' => 'https://drupal.org/project/contextual_range_filter')
+        ),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+    else {
+      $requirements['contextual_range_filter'] = array(
+        'title' => $t('Views Contextual Range Filter'),
+        'severity' => REQUIREMENT_OK,
+        'value' => $t('Views Contextual Range Filter Module Installed'),
+      );
+    }
+
   }
   return $requirements;
 }
@@ -470,6 +514,11 @@ function google_store_locator_uninstall() {
   variable_del('gsl_map_long');
   variable_del('gsl_map_lat');
   variable_del('gsl_map_zoom');
+  variable_del('gsl_map_cluster');
+  variable_del('gsl_cluster_zoom_limit');
+  variable_del('gsl_map_cluster_grid');
+  variable_del('gsl_viewport');
+  variable_del('gsl_marker_zoom_limit');
   variable_del('gsl_marker_icon');
   variable_del('gsl_items_per_panel');
   variable_del('gsl_loc_aware');
@@ -524,4 +573,17 @@ function google_store_locator_update_7102() {
   }
 
   return t('Phone, web, and misc. fields have been added to the Store Location content type.');
+}
+
+/**
+ * Set contextual range filter variables.
+ */
+function google_store_locator_update_7103() {
+  $contextual_range_filter_numeric = variable_get('contextual_range_filter_numeric_field_names', array());
+  $contextual_range_filter_numeric += array(
+    'field_data_gsl_geofield:gsl_geofield_lat' => 'field_data_gsl_geofield:gsl_geofield_lat',
+    'field_data_gsl_geofield:gsl_geofield_lon' => 'field_data_gsl_geofield:gsl_geofield_lon',
+  );
+  variable_set('contextual_range_filter_numeric_field_names', $contextual_range_filter_numeric);
+  return t('Contextual Range filter variables set.');
 }

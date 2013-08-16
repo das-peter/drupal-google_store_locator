@@ -91,6 +91,24 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['sorts']['created']['table'] = 'node';
   $handler->display->display_options['sorts']['created']['field'] = 'created';
   $handler->display->display_options['sorts']['created']['order'] = 'DESC';
+  /* Contextual filter: Content: Store Locator Geofield (gsl_geofield:lat) */
+  $handler->display->display_options['arguments']['gsl_geofield_lat']['id'] = 'gsl_geofield_lat';
+  $handler->display->display_options['arguments']['gsl_geofield_lat']['table'] = 'field_data_gsl_geofield';
+  $handler->display->display_options['arguments']['gsl_geofield_lat']['field'] = 'gsl_geofield_lat';
+  $handler->display->display_options['arguments']['gsl_geofield_lat']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['gsl_geofield_lat']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['gsl_geofield_lat']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['gsl_geofield_lat']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['gsl_geofield_lat']['break_phrase'] = TRUE;
+  /* Contextual filter: Content: Store Locator Geofield (gsl_geofield:lon) */
+  $handler->display->display_options['arguments']['gsl_geofield_lon']['id'] = 'gsl_geofield_lon';
+  $handler->display->display_options['arguments']['gsl_geofield_lon']['table'] = 'field_data_gsl_geofield';
+  $handler->display->display_options['arguments']['gsl_geofield_lon']['field'] = 'gsl_geofield_lon';
+  $handler->display->display_options['arguments']['gsl_geofield_lon']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['gsl_geofield_lon']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['gsl_geofield_lon']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['gsl_geofield_lon']['summary_options']['items_per_page'] = '25';
+  $handler->display->display_options['arguments']['gsl_geofield_lon']['break_phrase'] = TRUE;
   /* Filter criterion: Content: Type */
   $handler->display->display_options['filters']['type']['id'] = 'type';
   $handler->display->display_options['filters']['type']['table'] = 'node';
