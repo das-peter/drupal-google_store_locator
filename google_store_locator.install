@@ -470,7 +470,7 @@ function google_store_locator_installed_fields() {
 function google_store_locator_install() {
 
   $fields = google_store_locator_installed_fields();
-
+  // Add all fields and their instances.
   foreach ($fields as $field) {
     // Look for existing field.
     $field_config = field_info_field($field['field_config']['field_name']);
@@ -483,6 +483,15 @@ function google_store_locator_install() {
       field_create_instance($field['field_instance']);
     }
   }
+
+  // Set variables.
+  $contextual_range_filter_numeric = variable_get('contextual_range_filter_numeric_field_names', array());
+  $contextual_range_filter_numeric += array(
+    'field_data_gsl_geofield:gsl_geofield_lat' => 'field_data_gsl_geofield:gsl_geofield_lat',
+    'field_data_gsl_geofield:gsl_geofield_lon' => 'field_data_gsl_geofield:gsl_geofield_lon',
+  );
+  variable_set('contextual_range_filter_numeric_field_names', $contextual_range_filter_numeric);
+  
 }
 
 /**
