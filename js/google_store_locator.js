@@ -76,22 +76,44 @@
     if ($("#cluster-loading").length == 0) {
       $('#' + Drupal.GSL.currentMap.mapid).append('<div id="cluster-loading" class="ajax-progress ajax-progress-throbber"><div>' + Drupal.t('Loading') + '<span class="throbber"></span></div></div>');
     }
-
     $.getJSON(url, function(json) {
       //defining our success handler, i.e. if the path we're passing to $.getJSON
       //is legit and returns a JSON file then this runs.
-      var markerClusterEnabled = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapcluster'];
-      var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
-      var switchToMarkerCluster = (Drupal.GSL.currentMap.getZoom() < markerClusterZoom);
+
+      // These will be either all stores, or those within the viewport.
       var stores = that.parseStores_(json);
       $("#cluster-loading").remove();
       that.setStores(stores);
-      if (markerClusterEnabled && switchToMarkerCluster) {
-        if ($.isEmptyObject(Drupal.GSL.currentCluster)) {
-          Drupal.GSL.initializeCluster(stores, that);
-        }
+    });
+
+    // Filter stores for features.
+    var stores = [];
+    for (var i = 0, store; store = that._stores[i]; i++) {
+      if (store.hasAllFeatures(features)) {
+        stores.push(store);
       }
-      callback(stores);
+    }
+    this.sortByDistance_(bounds.getCenter(), stores);
+
+    if (markerClusterEnabled && switchToMarkerCluster) {
+      if ($.isEmptyObject(Drupal.GSL.currentCluster)) {
+        Drupal.GSL.initializeCluster(stores, that);
+      }
+    }
+    callback(stores);
+  };
+
+  /**
+   * Overridden: Sorts a list of given stores by distance from a point in ascending order.
+   * Directly manipulates the given array (has side effects).
+   * @private
+   * @param {google.maps.LatLng} latLng the point to sort from.
+   * @param {!Array.<!storeLocator.Store>} stores  the stores to sort.
+   */
+  storeLocator.StaticDataFeed.prototype.sortByDistance_ = function(latLng,
+                                                                   stores) {
+    stores.sort(function(a, b) {
+      return a.distanceTo(latLng) - b.distanceTo(latLng);
     });
   };
 
@@ -99,7 +121,7 @@
   Drupal.GSL.dataSource.storeCount = 0;
 
   /**
-   * Overriden: Set the stores for this data feed.
+   * Overridden: Set the stores for this data feed.
    * @param {!Array.<!storeLocator.Store>} stores the stores for this data feed.
    *
    * - Sets _stores since storeLocator variable is minified
