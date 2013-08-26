@@ -2,10 +2,10 @@
   // module global namespace
   Drupal.GSL = {};
 
-/**
- * @extends storeLocator.StaticDataFeed
- * @constructor
- */
+  /**
+   * @extends storeLocator.StaticDataFeed
+   * @constructor
+   */
   Drupal.GSL.dataSource = function (datapath) {
     // call the parent constructor
     Drupal.GSL.dataSource.parent.call(this);
@@ -83,24 +83,23 @@
       // These will be either all stores, or those within the viewport.
       var stores = that.parseStores_(json);
       $("#cluster-loading").remove();
-      that.setStores(stores);
+
+      // Filter stores for features.
+      var filtered_stores = [];
+      for (var i = 0, store; store = stores[i]; i++) {
+        if (store.hasAllFeatures(features)) {
+          filtered_stores.push(store);
+        }
+      }
+      that.sortByDistance_(bounds.getCenter(), filtered_stores);
+
+      if (markerClusterEnabled && switchToMarkerCluster) {
+        if ($.isEmptyObject(Drupal.GSL.currentCluster)) {
+          Drupal.GSL.initializeCluster(filtered_stores, that);
+        }
+      }
+      callback(filtered_stores);
     });
-
-    // Filter stores for features.
-    var stores = [];
-    for (var i = 0, store; store = that._stores[i]; i++) {
-      if (store.hasAllFeatures(features)) {
-        stores.push(store);
-      }
-    }
-    this.sortByDistance_(bounds.getCenter(), stores);
-
-    if (markerClusterEnabled && switchToMarkerCluster) {
-      if ($.isEmptyObject(Drupal.GSL.currentCluster)) {
-        Drupal.GSL.initializeCluster(stores, that);
-      }
-    }
-    callback(stores);
   };
 
   /**
@@ -110,8 +109,8 @@
    * @param {google.maps.LatLng} latLng the point to sort from.
    * @param {!Array.<!storeLocator.Store>} stores  the stores to sort.
    */
-  storeLocator.StaticDataFeed.prototype.sortByDistance_ = function(latLng,
-                                                                   stores) {
+  Drupal.GSL.dataSource.prototype.sortByDistance_ = function(latLng,
+                                                             stores) {
     stores.sort(function(a, b) {
       return a.distanceTo(latLng) - b.distanceTo(latLng);
     });
@@ -228,10 +227,10 @@
     return stores;
   };
 
-/**
- * @extends storeLocator.Panel
- * @constructor
- */
+  /**
+   * @extends storeLocator.Panel
+   * @constructor
+   */
   Drupal.GSL.Panel = function (el, opt_options) {
     // set items per panel
     if (opt_options['items_per_panel'] && !isNaN(opt_options['items_per_panel'])) {
@@ -295,7 +294,7 @@
 
       if (!storeLi.clickHandler_) {
         storeLi.clickHandler_ = google.maps.event.addDomListener(
-            storeLi, 'click', clickHandler);
+          storeLi, 'click', clickHandler);
       }
 
       that.storeList_.append(storeLi);
