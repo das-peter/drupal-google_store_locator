@@ -34,8 +34,6 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['style_options']['data_source']['value'] = 'wkt';
   $handler->display->display_options['style_options']['data_source']['latitude'] = 'gsl_geofield';
   $handler->display->display_options['style_options']['data_source']['longitude'] = 'gsl_geofield';
-  $handler->display->display_options['style_options']['data_source']['geofield'] = 'gsl_geofield';
-  $handler->display->display_options['style_options']['data_source']['wkt'] = 'gsl_geofield';
   $handler->display->display_options['style_options']['data_source']['name_field'] = 'title';
   $handler->display->display_options['style_options']['data_source']['description_field'] = 'gsl_addressfield';
   $handler->display->display_options['style_options']['jsonp_prefix'] = '';
@@ -86,6 +84,10 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['fields']['gsl_props_web']['id'] = 'gsl_props_web';
   $handler->display->display_options['fields']['gsl_props_web']['table'] = 'field_data_gsl_props_web';
   $handler->display->display_options['fields']['gsl_props_web']['field'] = 'gsl_props_web';
+  /* Field: Content: Nid */
+  $handler->display->display_options['fields']['nid']['id'] = 'nid';
+  $handler->display->display_options['fields']['nid']['table'] = 'node';
+  $handler->display->display_options['fields']['nid']['field'] = 'nid';
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -143,6 +145,8 @@ function google_store_locator_views_default_views() {
     t('Misc. Properties'),
     t('Store Phone'),
     t('Store Website'),
+    t('Nid'),
+    t('All'),
     t('Page'),
   );
   $export['google_store_locator_json_export'] = $view;

@@ -116,9 +116,6 @@
     });
   };
 
-  // Global store counter for unique ids
-  Drupal.GSL.dataSource.storeCount = 0;
-
   /**
    * Overridden: Set the stores for this data feed.
    * @param {!Array.<!storeLocator.Store>} stores the stores for this data feed.
@@ -162,7 +159,7 @@
       var Ycoord = item.geometry.coordinates[1];
 
       // create a unique id
-      var store_id = 'store-' + (Drupal.GSL.dataSource.storeCount++);
+      var store_id = 'store-' + (itemFeatures.nid);
 
       // set title to views_geojson 'name'
       if ('name' in itemFeatures) {
@@ -440,6 +437,7 @@
             });
 
           if (marker.getMap() != this.getMap()) {
+          // Marker hasn't been added to the map before. Decide what to do with it.
             var markerClusterEnabled = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapcluster'];
             var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
             var switchToMarkerCluster = (Drupal.GSL.currentMap.getZoom() < markerClusterZoom);
