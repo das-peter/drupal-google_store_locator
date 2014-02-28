@@ -181,12 +181,6 @@ function google_store_locator_admin_form($form, &$form_state) {
         ':input[name="gsl_loc_aware"]' => array('checked' => TRUE)),
     ),
   );
-  $form['google_store_locator']['advanced']['gsl_loc_aware'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable Map with Location Awareness'),
-    '#description' => t('This allows users to share their location via the browser, and then center the map view on that location'),
-    '#default_value' => variable_get('gsl_loc_aware', FALSE),
-  );
   $form['google_store_locator']['advanced']['gsl_map_cluster'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable marker clustering'),

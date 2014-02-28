@@ -491,7 +491,7 @@ function google_store_locator_install() {
     'field_data_gsl_geofield:gsl_geofield_lon' => 'field_data_gsl_geofield:gsl_geofield_lon',
   );
   variable_set('contextual_range_filter_numeric_field_names', $contextual_range_filter_numeric);
-  
+
 }
 
 /**
@@ -515,6 +515,8 @@ function google_store_locator_uninstall() {
   variable_del('gsl_items_per_panel');
   variable_del('gsl_loc_aware');
   variable_del('gsl_loc_aware_zoom');
+
+
 }
 
 /**
