@@ -516,7 +516,34 @@ function google_store_locator_uninstall() {
   variable_del('gsl_loc_aware');
   variable_del('gsl_loc_aware_zoom');
 
+  // Collect all store nodes that were created when this module was enabled.
+  $query = db_select('node', 'n');
+  $query->fields('n', array('nid'));
+  $query->condition('type', 'store_location', '=');
+  $results = $query->execute()->fetchAllAssoc('nid');
 
+  // ...and delete them all.
+  node_delete_multiple(array_keys($results));
+
+  // Delete the field bases, and instances, and their data that this module
+  // creates.
+  $fields = google_store_locator_installed_fields();
+  foreach($fields as $field) {
+    field_delete_field($field['field_config']['field_name']);
+  }
+
+  // Loop over any remaining field instances attached to the 'store_location'
+  // bundle and delete them individually.
+  $instances = field_info_instances('node', 'store_location');
+  foreach ($instances as $instance_name => $instance) {
+    field_delete_instance($instance);
+  }
+
+  // Delete the content type
+  node_type_delete('store_location');
+
+  // Purge all field information.
+  field_purge_batch(1000);
 }
 
 /**
