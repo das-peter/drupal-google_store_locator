@@ -454,7 +454,7 @@ function google_store_locator_installed_fields() {
         ),
       ),
       'required' => 0,
-      'description' => 'Enter website as a comma separated value i.e. Text, URL. Example: Website, http://www.mywebsite.com',
+      'description' => 'Enter website as a comma separated value (note: do not include white space and use a fully qualified URL) e.g. Some Store,http://www.some-store.com',
       'default_value' => NULL,
       'field_name' => 'gsl_props_web',
       'entity_type' => 'node',
