@@ -34,6 +34,8 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['style_options']['data_source']['value'] = 'wkt';
   $handler->display->display_options['style_options']['data_source']['latitude'] = 'gsl_geofield';
   $handler->display->display_options['style_options']['data_source']['longitude'] = 'gsl_geofield';
+  $handler->display->display_options['style_options']['data_source']['geofield'] = 'gsl_geofield';
+  $handler->display->display_options['style_options']['data_source']['wkt'] = 'gsl_geofield';
   $handler->display->display_options['style_options']['data_source']['name_field'] = 'title';
   $handler->display->display_options['style_options']['data_source']['description_field'] = 'gsl_addressfield';
   $handler->display->display_options['style_options']['jsonp_prefix'] = '';
