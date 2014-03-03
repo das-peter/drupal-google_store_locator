@@ -46,7 +46,7 @@ function google_store_locator_node_info() {
  */
 function google_store_locator_menu() {
 
-  $items[variable_get('gsl_display_path', 'store_locator')] = array(
+  $items[variable_get('gsl_display_path', 'store-locator')] = array(
     'title' => variable_get('gsl_title', 'Store Locator'),
     'description' => 'Store locator map using Google Store Location Library',
     'page callback' => 'google_store_locator_default_page',
@@ -157,8 +157,8 @@ function google_store_locator_admin_form($form, &$form_state) {
   $form['google_store_locator']['advanced']['gsl_display_path'] = array(
     '#type' => 'textfield',
     '#title' => t('What is the desired path for the store locator?'),
-    '#default_value' => variable_get('gsl_display_path', 'store_locator'),
-    '#description' => t('By default it will be served from /store_locator'),
+    '#default_value' => variable_get('gsl_display_path', 'store-locator'),
+    '#description' => t('By default it will be served from /store-locator'),
     '#required' => TRUE,
   );
   $form['google_store_locator']['advanced']['gsl_loc_aware'] = array(
@@ -478,7 +478,6 @@ function google_store_locator_admin_form_submit($form, &$form_state) {
     file_usage_add($file, 'google_store_locator', 'google_store_locator', $file->fid);
   }
   menu_rebuild();
-  $form_state['redirect'] = variable_get('gsl_display_path', 'store_locator');
 }
 
 /**
