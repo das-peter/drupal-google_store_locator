@@ -10,3 +10,4 @@ dependencies[] = geofield
 dependencies[] = libraries
 dependencies[] = views
 dependencies[] = views_geojson
+dependencies[] = list
