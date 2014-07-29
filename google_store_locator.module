@@ -140,6 +140,34 @@ function google_store_locator_admin_form($form, &$form_state) {
     );
   }
 
+  // Add distance functionality to the module.
+  $form['google_store_locator']['proximity'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Proximity settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+
+  // Place a check box for enabling or disabling the display of proximity.
+  $form['google_store_locator']['proximity']['proximity_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display proximity in google search.'),
+    '#default_value' => variable_get('proximity_enabled', 0),
+  );
+
+  // Allow the user to choose whether or not KM or MI are used.
+  $form['google_store_locator']['proximity']['proximity_metric'] = array(
+    '#type' => 'select',
+    '#title' => t('Metric'),
+    '#options' => array(
+      'mi' => t('Miles'),
+      'km' => t('KM'),
+    ),
+    '#default_value' => variable_get('proximity_metric', 'mi'),
+    '#description' => t('Determines whether distance is measured and displayed in MI or KM.'),
+  );
+
+
   // We put all advanced features into a fieldset.
   $form['google_store_locator']['advanced'] = array(
     '#type' => 'fieldset',
@@ -420,6 +448,8 @@ function theme_google_store_locator_contents($variables) {
   drupal_add_js(array(
     'gsl' => array(
       $gsl_map_id => $settings,
+      'proximity' => variable_get('proximity_enabled', 0),
+      'metric' => variable_get('proximity_metric', 'mi'),
     ),
   ), 'setting');
 

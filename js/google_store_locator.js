@@ -282,8 +282,36 @@
 
     // Add stores to list
     var items_per_panel = this.get('items_per_panel');
+    // Initialize the map value in order to get proximity
+    var map = Drupal.GSL.currentMap;
+
+    // loop through all store values
     for (var i = 0, ii = Math.min(items_per_panel, stores.length); i < ii; i++) {
+      // Get store data
       var storeLi = stores[i].getInfoPanelItem();
+
+      // Check if proximity was desired, and if so render it.
+      if(Drupal.settings.gsl.proximity){
+        // Determine if the user wants values converted to MI or KM.
+        // As the base value is in KM, apply a multiplier for KM to MI if desired.
+        if(Drupal.settings.gsl.metric == 'mi'){
+          proximityMultiplier = .621371;
+          metricText = 'miles';
+        }else{
+          proximityMultiplier = 1;
+          metricText = 'km';
+        }
+        // Calculate distance to the store
+        var storeDistance = Number((stores[i].distanceTo(map.getCenter()) * proximityMultiplier).toFixed(2));
+
+        // add distance to HTML
+        if($('.distance', storeLi).length > 0){ //if distance field already there, change text
+          $('.distance', storeLi).text(storeDistance + ' miles');
+        }else{ // No distance field yet! APPEND full HTML!
+          $('.address', storeLi).append('<div class="distance">' + storeDistance + ' ' + metricText + '</div>');
+        }
+      }
+
       storeLi['store'] = stores[i];
       if (selectedStore && stores[i].getId() == selectedStore.getId()) {
         $(storeLi).addClass('highlighted');
