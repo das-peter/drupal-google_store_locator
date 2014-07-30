@@ -90,6 +90,13 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#size' => 30,
     '#required' => TRUE,
   );
+
+  $form['google_store_locator']['gsl_display_search_marker'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Display marker for searched location?'),
+    '#default_value' => variable_get('gsl_display_search_marker', 0),
+  );
+
   $form['google_store_locator']['gsl_items_per_panel'] = array(
     '#type' => 'textfield',
     '#title' => t('How many stores should show in the panel?'),
@@ -450,6 +457,7 @@ function theme_google_store_locator_contents($variables) {
       $gsl_map_id => $settings,
       'proximity' => variable_get('proximity_enabled', 0),
       'metric' => variable_get('proximity_metric', 'mi'),
+      'display_search_marker' => variable_get('gsl_display_search_marker', 0),
     ),
   ), 'setting');
 
