@@ -2,6 +2,9 @@
   // module global namespace
   Drupal.GSL = {};
 
+  // Google stores markers
+  var homeMarker = [];
+
   /**
    * @extends storeLocator.StaticDataFeed
    * @constructor
@@ -46,6 +49,7 @@
       var url = this._datapath;
     }
     else {
+
       // Marker management is enabled. Load only some of the stores.
       var swPoint = bounds.getSouthWest();
       var nePoint = bounds.getNorthEast();
@@ -114,6 +118,7 @@
     stores.sort(function(a, b) {
       return a.distanceTo(latLng) - b.distanceTo(latLng);
     });
+
   };
 
   /**
@@ -258,6 +263,7 @@
    * Overridden storeLocator.Panel.prototype.stores_changed
    */
   Drupal.GSL.Panel.prototype.stores_changed = function() {
+
     if (!this.get('stores')) {
       return;
     }
@@ -310,6 +316,11 @@
         }else{ // No distance field yet! APPEND full HTML!
           $('.address', storeLi).append('<div class="distance">' + storeDistance + ' ' + metricText + '</div>');
         }
+      }
+
+      // Updates the home marker every single time there is a refresh
+      if(Drupal.settings.gsl.display_search_marker){
+        this.updateHomeMarker();
       }
 
       storeLi['store'] = stores[i];
@@ -484,4 +495,47 @@
       locator = null;
     }
   };
+
+
+  /**
+   * Semi hacky method of placing a marker for the users location.
+   * This fires everytime the map is updated.
+   *
+   * The correct method apparantly involves line 490 of panel.js and
+   * adding an event listener. I was unable to abstract how to make it work
+   * in that fashion.
+   */
+  // Update marker functionality
+
+  Drupal.GSL.Panel.prototype.updateHomeMarker = function(){
+
+    var locationValue = $('input','.storelocator-filter').val();
+
+    // If the location value isn't empty
+    if(locationValue.length > 0){
+      // Bring in maps geocoder
+      var geo = new google.maps.Geocoder;
+
+      //unset home marker if it exists
+      if(homeMarker){
+        for (var i = 0; i < homeMarker.length; i++) {
+          homeMarker[i].setMap(null);
+        }
+        homeMarker = [];
+      }
+
+      // Geocode entered address location
+      geo.geocode({'address':locationValue},function(results, status){
+        newHomeMarker = new google.maps.Marker({
+          map: Drupal.GSL.currentMap,
+          position: results[0].geometry.location,
+          title: 'You are here!',
+          // Use Google's default blue marker.
+          icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+        });
+        homeMarker.push(newHomeMarker);
+      });
+    }
+  }
+
 })(jQuery);
