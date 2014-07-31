@@ -132,6 +132,16 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#required' => TRUE,
   );
 
+  $form['google_store_locator']['gsl_max_zoom'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Maximum zoom level'),
+    '#default_value' => variable_get('gsl_max_zoom', '16'),
+    '#size' => 5,
+    '#element_validate' => array('element_validate_integer'),
+    '#description' => t('Enter a value from 0-21 with 0 being the farthest distance from the earth. This will the most a user can zoom in.'),
+    '#required' => TRUE,
+  );
+
   if (module_exists('file')) {
     $form['google_store_locator']['gsl_marker_icon'] = array(
       '#title' => t('Marker Icon'),
@@ -458,6 +468,7 @@ function theme_google_store_locator_contents($variables) {
       'proximity' => variable_get('proximity_enabled', 0),
       'metric' => variable_get('proximity_metric', 'mi'),
       'display_search_marker' => variable_get('gsl_display_search_marker', 0),
+      'max_zoom' => variable_get('gsl_max_zoom', 16)
     ),
   ), 'setting');
 
@@ -531,11 +542,21 @@ function google_store_locator_admin_form_validate($form, &$form_state) {
     }
   }
 
+  // Check that map zoom is between 0 and 21.
   if ($form_state['values']['gsl_map_zoom'] > 21 ||
       $form_state['values']['gsl_map_zoom'] < 0) {
     form_set_error('gsl_map_zoom',
     t('Please enter a zoom level between 0 and 21.'));
   }
+
+  // Check that max zoom is between 0 and 21.
+  if ($form_state['values']['gsl_max_zoom'] > 21 ||
+    $form_state['values']['gsl_max_zoom'] < 0) {
+    form_set_error('gsl_max_zoom',
+      t('Please enter a zoom level between 0 and 21.'));
+  }
+
+  // Restrict latitude to 180 degrees and longitude to 360 degrees.
   if ($form_state['values']['gsl_map_long'] > 180 ||
       $form_state['values']['gsl_map_long'] < -180) {
     form_set_error('gsl_map_long',
