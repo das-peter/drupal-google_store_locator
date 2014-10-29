@@ -263,13 +263,13 @@
    * Overridden storeLocator.Panel.prototype.stores_changed
    */
   Drupal.GSL.Panel.prototype.stores_changed = function() {
-
     if (!this.get('stores')) {
       return;
     }
 
     var view = this.get('view');
     var bounds = view && view.getMap().getBounds();
+    console.log(bounds)
 
     var that = this;
     var stores = this.get('stores');
@@ -390,7 +390,7 @@
     var map = Drupal.GSL.currentMap;
     var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
     var markerClusterGrid = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclustergrid'];
-    var mcOptions = {gridSize: markerClusterGrid, maxZoom: markerClusterZoom - 1};
+    var mcOptions = {gridSize: markerClusterGrid, maxZoom: Drupal.settings.gsl.max_zoom};
     // We populate it later in addStoreToMap().
     Drupal.GSL.currentCluster = new MarkerClusterer(map, [], mcOptions);
   }
