@@ -1,9 +1,6 @@
-;(function($) {
+;(function ($, Drupal, window, document, undefined) {
   // module global namespace
-  Drupal.GSL = {};
-
-  // Google stores markers
-  var homeMarker = [];
+  Drupal.GSL = Drupal.GSL || {};
 
   /**
    * @extends storeLocator.StaticDataFeed
@@ -16,6 +13,15 @@
     // initialize variables
     this._stores = [];
     this._datapath = datapath;
+
+    // The parent class calls this but sets this.firstCallback_ in it's
+    // getStores() which would be minified and is now overridden by a custom
+    // getStores().
+    // if (this.firstCallback_) {
+    //   this.firstCallback_();
+    // } else {
+    //   delete this.firstCallback_;
+    // }
   };
 
   // Set parent class
@@ -28,6 +34,16 @@
   Drupal.GSL.dataSource.prototype.constructor = Drupal.GSL.dataSource;
 
   Drupal.GSL.dataSource.prototype.getStores = function(bounds, features, callback) {
+    // Prevent race condition - if getStores is called before stores are
+    // loaded.
+    // Parent class does this so it might be needed here.
+    // if (!this._stores.length) {
+    //  var that = this;
+    //  this.firstCallback_ = function() {
+    //    that.getStores(bounds, features, callback);
+    //  };
+    //  return;
+    // }
 
     var markerClusterEnabled = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapcluster'];
     var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
@@ -49,7 +65,6 @@
       var url = this._datapath;
     }
     else {
-
       // Marker management is enabled. Load only some of the stores.
       var swPoint = bounds.getSouthWest();
       var nePoint = bounds.getNorthEast();
@@ -85,12 +100,12 @@
       //is legit and returns a JSON file then this runs.
 
       // These will be either all stores, or those within the viewport.
-      var stores = that.parseStores_(json);
+      var parsedStores = that.parseStores_(json);
       $("#cluster-loading").remove();
 
       // Filter stores for features.
       var filtered_stores = [];
-      for (var i = 0, store; store = stores[i]; i++) {
+      for (var i = 0, store; store = parsedStores[i]; i++) {
         if (store.hasAllFeatures(features)) {
           filtered_stores.push(store);
         }
@@ -103,6 +118,9 @@
         }
       }
       callback(filtered_stores);
+
+      // Store the stores on the main object.
+      that.setStores(filtered_stores);
     });
   };
 
@@ -118,7 +136,6 @@
     stores.sort(function(a, b) {
       return a.distanceTo(latLng) - b.distanceTo(latLng);
     });
-
   };
 
   /**
@@ -139,7 +156,6 @@
    */
   Drupal.GSL.dataSource.prototype.parseStores_ = function(json) {
     var stores = [];
-
     if (!('features' in json)) {
       return stores;
     }
@@ -164,7 +180,26 @@
       var Ycoord = item.geometry.coordinates[1];
 
       // create a unique id
-      var store_id = 'store-' + (itemFeatures.nid);
+      var store_id = '';
+
+      if (itemFeatures.uniqueid) {
+        // Allow the response to provide an id.
+        store_id = itemFeatures.uniqueid;
+      }
+      else if (itemFeatures.nid) {
+        // Legacy support: nid field name.
+        store_id = itemFeatures.nid;
+      }
+      else if (itemFeatures.Nid) {
+        // Legacy support: Nid Label.
+        store_id = itemFeatures.Nid;
+      }
+      else {
+        store_id = this.uniqueStoreId();
+      }
+
+      // Prepend store to ensure it's a valid id name.
+      store_id = 'store-' + store_id;
 
       // set title to views_geojson 'name'
       if ('name' in itemFeatures) {
@@ -226,7 +261,22 @@
       var store = new storeLocator.Store(store_id, position, storeFeatureSet, storeProps);
       stores.push(store);
     }
+
     return stores;
+  };
+
+  /**
+   * Generate a unique id for a store.
+   * @ref: http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+   */
+  Drupal.GSL.dataSource.prototype.uniqueStoreId = function(store) {
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+                 .toString(16)
+                 .substring(1);
+    }
+
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
   };
 
   /**
@@ -269,7 +319,6 @@
 
     var view = this.get('view');
     var bounds = view && view.getMap().getBounds();
-    console.log(bounds)
 
     var that = this;
     var stores = this.get('stores');
@@ -289,38 +338,50 @@
     // Add stores to list
     var items_per_panel = this.get('items_per_panel');
     // Initialize the map value in order to get proximity
-    var map = Drupal.GSL.currentMap;
+    var map = view.getMap() || Drupal.GSL.currentMap;
+
+    // Set proximity variables.
+    var metricText, proximityMultiplier;
+    var proximityEnabled = Drupal.settings.gsl.proximity;
+    if (proximityEnabled) {
+      // Determine if the user wants values converted to MI or KM.
+      // As the base value is in KM, apply a multiplier for KM to MI if desired.
+      if (Drupal.settings.gsl.metric == 'mi'){
+        proximityMultiplier = .621371;
+        metricText = 'miles';
+      }
+      else{
+        proximityMultiplier = 1;
+        metricText = 'km';
+      }
+    }
+
+    // Updates the home marker every single time there is a refresh.
+    // Set before stores loop to use as the originLatLng.
+    if (Drupal.settings.gsl.display_search_marker) {
+      that.updateHomeMarker();
+    }
 
     // loop through all store values
     for (var i = 0, ii = Math.min(items_per_panel, stores.length); i < ii; i++) {
       // Get store data
       var storeLi = stores[i].getInfoPanelItem();
 
-      // Check if proximity was desired, and if so render it.
-      if(Drupal.settings.gsl.proximity){
-        // Determine if the user wants values converted to MI or KM.
-        // As the base value is in KM, apply a multiplier for KM to MI if desired.
-        if(Drupal.settings.gsl.metric == 'mi'){
-          proximityMultiplier = .621371;
-          metricText = 'miles';
-        }else{
-          proximityMultiplier = 1;
-          metricText = 'km';
-        }
+     // Check if proximity was desired, and if so render it.
+      if (proximityEnabled) {
         // Calculate distance to the store
-        var storeDistance = Number((stores[i].distanceTo(map.getCenter()) * proximityMultiplier).toFixed(2));
+        var originLatLng = Drupal.GSL.homeMarker ? Drupal.GSL.homeMarker.getPosition() : map.getCenter();
+        var storeDistance = Number((stores[i].distanceTo(originLatLng) * proximityMultiplier).toFixed(2));
 
         // add distance to HTML
-        if($('.distance', storeLi).length > 0){ //if distance field already there, change text
+        if ($('.distance', storeLi).length > 0) {
+          //if distance field already there, change text.
           $('.distance', storeLi).text(storeDistance + ' miles');
-        }else{ // No distance field yet! APPEND full HTML!
+        }
+        else {
+          // No distance field yet! APPEND full HTML!
           $('.address', storeLi).append('<div class="distance">' + storeDistance + ' ' + metricText + '</div>');
         }
-      }
-
-      // Updates the home marker every single time there is a refresh
-      if(Drupal.settings.gsl.display_search_marker){
-        this.updateHomeMarker();
       }
 
       storeLi['store'] = stores[i];
@@ -373,6 +434,84 @@
       });
     }
   };
+
+ /**
+  * Semi hacky method of placing a marker for the users location.
+  * This fires everytime the map is updated.
+  *
+  * The correct method apparantly involves line 490 of panel.js and
+  * adding an event listener. I was unable to abstract how to make it work
+  * in that fashion.
+  */
+  Drupal.GSL.Panel.prototype.updateHomeMarker = function(){
+    var locationValue = $('input','.storelocator-filter').val();
+
+    // If the location value isn't empty
+    if (locationValue.length > 0) {
+      var view = this.get('view');
+
+      // Skip if marker is the same.
+      if (Drupal.GSL.homeMarker && Drupal.GSL.homeMarker.getTitle() == locationValue && Drupal.GSL.homeMarker.getMap() == view.getMap()) {
+        return;
+      }
+
+      // Bring in maps geocoder
+      var geo = new google.maps.Geocoder;
+
+      // Geocode entered address location
+      geo.geocode({'address':locationValue}, function(results, status) {
+        if (results.length) {
+          // Clear original marker.
+          Drupal.GSL.homeMarker.setMap(null);
+
+          Drupal.GSL.homeMarker = new google.maps.Marker({
+            map: view.getMap(),
+            position: results[0].geometry.location,
+            title: locationValue,
+            // Use Google's default blue marker.
+            icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+          });
+
+          if (results[0].formatted_address) {
+            Drupal.GSL.homeMarker.setTitle(results[0].formatted_address);
+          }
+        }
+      });
+    }
+  };
+
+  /**
+   * Override addStoreToMap() to implement marker cluster.
+   *
+   * Add a store to the map.
+   * @param {storeLocator.Store} store the store to add.
+   */
+  storeLocator.View.prototype.addStoreToMap = function(store) {
+    var marker = this.getMarker(store);
+    store.setMarker(marker);
+    var that = this;
+
+    marker.clickListener_ = google.maps.event.addListener(marker, 'click',
+      function() {
+        that.highlight(store, false);
+      });
+
+    if (marker.getMap() != this.getMap()) {
+      // Marker hasn't been added to the map before. Decide what to do with it.
+      var markerClusterEnabled = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapcluster'];
+      var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
+      var switchToMarkerCluster = (Drupal.GSL.currentMap.getZoom() < markerClusterZoom);
+      if (markerClusterEnabled && switchToMarkerCluster) {
+        // Marker is added to the cluster.
+        Drupal.GSL.currentCluster.addMarker(marker);
+      }
+      else {
+        // Marker is added directly to the map.
+        marker.setMap(this.getMap());
+      }
+    }
+  };
+
 
   //Initialize variable for
   Drupal.GSL.currentMap = {};
@@ -464,79 +603,9 @@
           items_per_panel: map_settings['items_per_panel'],
           locationSearchLabel: map_settings['search_label']
         });
-
-        // Override addStoreToMap() to implement marker cluster.
-        locator.view.addStoreToMap = function(store) {
-          var marker = this.getMarker(store);
-          store.setMarker(marker);
-          var that = this;
-
-          marker.clickListener_ = google.maps.event.addListener(marker, 'click',
-            function() {
-              that.highlight(store, false);
-            });
-
-          if (marker.getMap() != this.getMap()) {
-          // Marker hasn't been added to the map before. Decide what to do with it.
-            var markerClusterEnabled = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapcluster'];
-            var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
-            var switchToMarkerCluster = (Drupal.GSL.currentMap.getZoom() < markerClusterZoom);
-            if (markerClusterEnabled && switchToMarkerCluster) {
-              // Marker is added to the cluster.
-              Drupal.GSL.currentCluster.addMarker(marker);
-            }
-            else {
-              // Marker is added directly to the map.
-              marker.setMap(this.getMap());
-            }
-          }
-        };
       } // mapid loop
 
       locator = null;
     }
   };
-
-
-  /**
-   * Semi hacky method of placing a marker for the users location.
-   * This fires everytime the map is updated.
-   *
-   * The correct method apparantly involves line 490 of panel.js and
-   * adding an event listener. I was unable to abstract how to make it work
-   * in that fashion.
-   */
-  // Update marker functionality
-
-  Drupal.GSL.Panel.prototype.updateHomeMarker = function(){
-
-    var locationValue = $('input','.storelocator-filter').val();
-
-    // If the location value isn't empty
-    if(locationValue.length > 0){
-      // Bring in maps geocoder
-      var geo = new google.maps.Geocoder;
-
-      //unset home marker if it exists
-      if(homeMarker){
-        for (var i = 0; i < homeMarker.length; i++) {
-          homeMarker[i].setMap(null);
-        }
-        homeMarker = [];
-      }
-
-      // Geocode entered address location
-      geo.geocode({'address':locationValue},function(results, status){
-        newHomeMarker = new google.maps.Marker({
-          map: Drupal.GSL.currentMap,
-          position: results[0].geometry.location,
-          title: 'You are here!',
-          // Use Google's default blue marker.
-          icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-        });
-        homeMarker.push(newHomeMarker);
-      });
-    }
-  }
-
-})(jQuery);
+})(jQuery, Drupal, this, this.document);
