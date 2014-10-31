@@ -1,7 +1,13 @@
-(function ($) {
+(function ($, Drupal, window, document, undefined) {
+  Drupal.GSL = Drupal.GSL || {};
 
   window.onload = function() {
-    navigator.geolocation.getCurrentPosition(positionSuccess, positionError);
+    if (window.navigator && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(positionSuccess, positionError, ({
+        maximumAge: 60 * 1000,
+        timeout: 10 * 1000
+      }));
+    }
   };
 
   /**
@@ -18,7 +24,7 @@
 
     Drupal.GSL.currentMap.setZoom(zoom);
 
-    var marker = new google.maps.Marker({
+    var marker = Drupal.GSL.homeMarker = new google.maps.Marker({
       map: Drupal.GSL.currentMap,
       position: latLng,
       title: 'You are here!',
@@ -30,11 +36,16 @@
     $.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latLng.toUrlValue() + "&sensor=true",
       function(response) {
         // Parse the JSON response object.
-        if(response.results.length) {
+        if (response.results.length) {
           // There's at least one human-readable address. Note the response is
           // returned from most specific to least specific. We go with most
           // specific.
           marker.setTitle(response.results[0].formatted_address);
+          var $searchBox = $('input','.storelocator-filter');
+          if ($searchBox.length && !$searchBox.val()) {
+            $searchBox.val(response.results[0].formatted_address);
+            $searchBox.change();
+          }
         }
       }, "json");
   }
@@ -63,4 +74,4 @@
     document.getElementById('info').innerHTML = msg;
   }
 
-})(jQuery);
+})(jQuery, Drupal, this, this.document);
