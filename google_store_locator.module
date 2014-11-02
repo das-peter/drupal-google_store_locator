@@ -414,7 +414,7 @@ function theme_google_store_locator_contents($variables) {
     ),
     'compiled_js' => array(
       '#attached' => array(
-        'js' => array(libraries_get_path('storelocator') . '/js/store-locator.compiled.js'),
+        'js' => array(libraries_get_path('storelocator') . '/dist/store-locator.min.js'),
       ),
     ),
     'build_js' => array(
