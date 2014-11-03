@@ -439,6 +439,18 @@
     }
   };
 
+  /**
+   * Overridden storeLocator.Panel.prototype.view_changed.
+   */
+  Drupal.GSL.Panel.prototype.view_changed = function() {
+    this.parent.prototype.view_changed.apply(this, arguments);
+    var view = this.get('view');
+
+    // Remove zoom listener to fix bug that causes the map to center on the
+    // selected store after zooming.
+    google.maps.event.clearListeners(view.getMap(), 'zoom_changed');
+  }
+
  /**
   * Semi hacky method of placing a marker for the users location.
   * This fires everytime the map is updated.
