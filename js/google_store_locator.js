@@ -7,8 +7,9 @@
    * @constructor
    */
   Drupal.GSL.dataSource = function (datapath) {
+    this.parent = Drupal.GSL.dataSource.parent;
     // call the parent constructor
-    Drupal.GSL.dataSource.parent.call(this);
+    this.parent.call(this);
 
     // initialize variables
     this._stores = [];
@@ -28,7 +29,7 @@
   Drupal.GSL.dataSource.parent = storeLocator.StaticDataFeed;
 
   // Inherit parent's prototype
-  Drupal.GSL.dataSource.prototype = new Drupal.GSL.dataSource.parent;
+  Drupal.GSL.dataSource.prototype = Object.create(Drupal.GSL.dataSource.parent.prototype);
 
   // Correct the constructor pointer
   Drupal.GSL.dataSource.prototype.constructor = Drupal.GSL.dataSource;
@@ -117,10 +118,9 @@
           Drupal.GSL.initializeCluster(filtered_stores, that);
         }
       }
-      callback(filtered_stores);
 
-      // Store the stores on the main object.
-      that.setStores(filtered_stores);
+      // The callback sets the stores on the main object.
+      callback(filtered_stores);
     });
   };
 
@@ -146,7 +146,7 @@
    */
   Drupal.GSL.dataSource.prototype.setStores = function(stores) {
     this._stores = stores;
-    Drupal.GSL.dataSource.parent.prototype.setStores.apply(this, arguments);
+    this.parent.prototype.setStores.apply(this, arguments);
   };
 
   /**
@@ -284,6 +284,8 @@
    * @constructor
    */
   Drupal.GSL.Panel = function (el, opt_options) {
+    this.parent = Drupal.GSL.Panel.parent;
+
     // set items per panel
     if (opt_options['items_per_panel'] && !isNaN(opt_options['items_per_panel'])) {
       this.set('items_per_panel', opt_options['items_per_panel']);
@@ -294,18 +296,20 @@
     }
 
     // call the parent constructor (in compiled format)
-    storeLocator.Panel.call(this, el, opt_options);
+    this.parent.call(this, el, opt_options);
 
     // ensure this variable is set
     this.storeList_ = $('.store-list', el);
   };
 
-  // When we create a new object of type Drupal.GSL.Panel that object will
-  // inherit all the properties of it's constructor prototype i.e.
-  // Drupal.GSL.Panel.prototype. Thus we need to properly set the prototype.
-  // Object.create() creates a new object with the specified prototype object
-  // and properties.
-  Drupal.GSL.Panel.prototype = Object.create(storeLocator.Panel.prototype);
+  // Set parent class
+  Drupal.GSL.Panel.parent = storeLocator.Panel;
+
+  // Extend object.
+  Drupal.GSL.Panel.prototype = Object.create(Drupal.GSL.Panel.parent.prototype);
+
+  // Correct the constructor pointer.
+  Drupal.GSL.Panel.prototype.constructor = Drupal.GSL.Panel;
 
   Drupal.GSL.Panel.ITEMS_PER_PANEL_DEFAULT = 10;
 
@@ -403,7 +407,7 @@
    */
   Drupal.GSL.Panel.prototype.selectedStore_changed = function() {
     // Call the parent method in the context of this object using 'this'.
-    storeLocator.Panel.prototype.selectedStore_changed.call(this);
+    this.parent.prototype.selectedStore_changed.apply(this, arguments);
 
     // Remember that this method runs on the initial map build. Then it runs
     // again when you select a store in the panel. We only care about the latter
