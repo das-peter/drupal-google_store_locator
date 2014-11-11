@@ -24,13 +24,19 @@
 
     Drupal.GSL.currentMap.setZoom(zoom);
 
-    var marker = Drupal.GSL.homeMarker = new google.maps.Marker({
-      map: Drupal.GSL.currentMap,
+    var showMarker = Drupal.settings.gsl && Drupal.settings.gsl.display_search_marker;
+    var markerOptions = {
       position: latLng,
       title: 'You are here!',
       // Use Google's default blue marker.
       icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-    });
+    };
+
+    if (showMarker) {
+      markerOptions.map = Drupal.GSL.currentMap;
+    }
+
+    var marker = Drupal.GSL.homeMarker = new google.maps.Marker(markerOptions);
 
     // And reverse geocode.
     $.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latLng.toUrlValue() + "&sensor=true",

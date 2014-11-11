@@ -361,9 +361,16 @@
     }
 
     // Updates the home marker every single time there is a refresh.
-    // Set before stores loop to use as the originLatLng.
-    if (Drupal.settings.gsl.display_search_marker) {
-      that.updateHomeMarker();
+    that.updateHomeMarker();
+
+    // Set before stores loop so it can be used for distance calculations.
+    // Use home marker if exists and is on a map, else
+    var originLatLng = null;
+    if (Drupal.GSL.homeMarker) {
+      originLatLng = Drupal.GSL.homeMarker.getPosition();
+    }
+    else {
+      originLatLng = map.getCenter();
     }
 
     // loop through all store values
@@ -374,7 +381,7 @@
      // Check if proximity was desired, and if so render it.
       if (proximityEnabled) {
         // Calculate distance to the store
-        var originLatLng = Drupal.GSL.homeMarker ? Drupal.GSL.homeMarker.getPosition() : map.getCenter();
+
         var storeDistance = Number((stores[i].distanceTo(originLatLng) * proximityMultiplier).toFixed(2));
 
         // add distance to HTML
@@ -443,12 +450,18 @@
    * Overridden storeLocator.Panel.prototype.view_changed.
    */
   Drupal.GSL.Panel.prototype.view_changed = function() {
+    var that = this;
     this.parent.prototype.view_changed.apply(this, arguments);
     var view = this.get('view');
+    var map = view.getMap();
 
     // Remove zoom listener to fix bug that causes the map to center on the
     // selected store after zooming.
-    google.maps.event.clearListeners(view.getMap(), 'zoom_changed');
+    google.maps.event.clearListeners(map, 'zoom_changed');
+
+    this.zoomListener_ = google.maps.event.addListener(map, 'zoom_changed', function() {
+      that.stores_changed();
+    });
   }
 
  /**
@@ -458,42 +471,59 @@
   * The correct method apparantly involves line 490 of panel.js and
   * adding an event listener. I was unable to abstract how to make it work
   * in that fashion.
+  *
+  * @return boolean
+  *   Returns true if marker was updated.
   */
-  Drupal.GSL.Panel.prototype.updateHomeMarker = function(){
+  Drupal.GSL.Panel.prototype.updateHomeMarker = function() {
     var locationValue = $('input','.storelocator-filter').val();
+    var view = this.get('view');
 
-    // If the location value isn't empty
-    if (locationValue.length > 0) {
-      var view = this.get('view');
-
-      // Skip if marker is the same.
-      if (Drupal.GSL.homeMarker && Drupal.GSL.homeMarker.getTitle() == locationValue && Drupal.GSL.homeMarker.getMap() == view.getMap()) {
-        return;
+    // If the location value is empty.
+    if (!locationValue.length) {
+      // Clear original marker.
+      if (Drupal.GSL.homeMarker) {
+        Drupal.GSL.homeMarker.setMap(null);
+        Drupal.GSL.homeMarker.unbindAll();
+        delete Drupal.GSL.homeMarker;
+        return true;
       }
 
-      // Bring in maps geocoder
-      var geo = new google.maps.Geocoder;
-
-      // Geocode entered address location
-      geo.geocode({'address':locationValue}, function(results, status) {
-        if (results.length) {
-          // Clear original marker.
-          Drupal.GSL.homeMarker.setMap(null);
-
-          Drupal.GSL.homeMarker = new google.maps.Marker({
-            map: view.getMap(),
-            position: results[0].geometry.location,
-            title: locationValue,
-            // Use Google's default blue marker.
-            icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-          });
-
-          if (results[0].formatted_address) {
-            Drupal.GSL.homeMarker.setTitle(results[0].formatted_address);
-          }
-        }
-      });
+      return false;
     }
+
+    var showMarker = Drupal.settings.gsl && Drupal.settings.gsl.display_search_marker;
+
+    // Skip if marker is the same.
+    if (Drupal.GSL.homeMarker && Drupal.GSL.homeMarker.getTitle() == locationValue && Drupal.GSL.homeMarker.getMap() == view.getMap()) {
+      return false;
+    }
+
+    // Bring in maps geocoder
+    var geo = new google.maps.Geocoder;
+
+    // Geocode entered address location
+    geo.geocode({'address':locationValue}, function(results, status) {
+      if (results.length) {
+        var markerOptions = {
+          position: results[0].geometry.location,
+          title: locationValue,
+          // Use Google's default blue marker.
+          icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+        };
+
+        if (showMarker && view) {
+          markerOptions.map = view.getMap();
+        }
+
+        Drupal.GSL.homeMarker = new google.maps.Marker(markerOptions);
+        if (results[0].formatted_address) {
+          Drupal.GSL.homeMarker.setTitle(results[0].formatted_address);
+        }
+      }
+    });
+
+    return true;
   };
 
   /**
@@ -617,8 +647,29 @@
         locator.panel = new Drupal.GSL.Panel(locator.elements.panel, {
           view: locator.view,
           items_per_panel: map_settings['items_per_panel'],
-          locationSearchLabel: map_settings['search_label']
+          locationSearch: true,
+          locationSearchLabel: map_settings['search_label'],
+          featureFilter: true
         });
+
+        // Register a change event since Panel does not.
+        $('.storelocator-filter input', locator.elements.panel)
+          .change(function(changeEvent) {
+            var $t = $(this);
+            var panel = $t.data('panel');
+            if (panel) {
+              // Update homemarker.
+              var updated = panel.updateHomeMarker();
+
+              // Trigger stores changed since this refreshes the home marker
+              // and updates the distance calculations.
+              var view = panel.get('view');
+              if (updated && view) {
+                panel.stores_changed();
+              }
+            }
+          })
+          .data('panel', locator.panel);
       } // mapid loop
 
       locator = null;
