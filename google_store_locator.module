@@ -199,6 +199,12 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#default_value' => variable_get('gsl_json_path', 'store-locator/json'),
     '#required' => TRUE,
   );
+  $form['google_store_locator']['advanced']['gsl_data_cache_enabled'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable client-side caching for the store data response'),
+    '#description' => t('If enabled, the response from the path above is cached on the client side per request url. The caching is per url to support marker management urls in the form of "data-path/{latitude}/{longitude}". Only the last 3 responses will be cached.'),
+    '#default_value' => variable_get('gsl_data_cache_enabled', TRUE),
+  );
   $form['google_store_locator']['advanced']['gsl_display_path'] = array(
     '#type' => 'textfield',
     '#title' => t('What is the desired path for the store locator?'),
@@ -313,39 +319,26 @@ function google_store_locator_admin_form($form, &$form_state) {
  * Callback function for /store_locator in hook_menu().
  */
 function google_store_locator_default_page() {
-
-  $data_path = variable_get('gsl_json_path', 'store-locator/json');
-  $map_zoom = variable_get('gsl_map_zoom', '4');
-  $map_cluster= variable_get('gsl_map_cluster', FALSE);
-  $map_cluster_grid= variable_get('gsl_map_cluster_grid', 50);
-  $map_cluster_zoom_limit = variable_get('gsl_cluster_zoom_limit', 10);
-  $viewport_manage = variable_get('gsl_viewport', FALSE);
-  $viewport_marker_limit = variable_get('gsl_marker_zoom_limit', 10);
-  $map_long = variable_get('gsl_map_long', '-100');
-  $map_lat = variable_get('gsl_map_lat', '40');
-  $items_per_panel = variable_get('gsl_items_per_panel', 10);
-  $loc_aware = variable_get('gsl_loc_aware', '0');
-  $search_label = variable_get('gsl_search_label', "Where are you?");
-
   $variables = array(
-    'data_path' => $data_path,
-    'map_zoom' => $map_zoom,
-    'map_cluster' => $map_cluster,
-    'map_cluster_grid' => $map_cluster_grid,
-    'map_cluster_zoom' => $map_cluster_zoom_limit,
-    'viewport_manage' => $viewport_manage,
-    'viewport_marker_limit' => $viewport_marker_limit,
-    'map_long' => $map_long,
-    'map_lat' => $map_lat,
-    'items_per_panel' => $items_per_panel,
-    'loc_aware' => $loc_aware,
-    'search_label' => $search_label,
+    'data_path' => variable_get('gsl_json_path', 'store-locator/json'),
+    'data_cache_enabled' => variable_get('gsl_data_cache_enabled', TRUE),
+    'map_zoom' => variable_get('gsl_map_zoom', '4'),
+    'map_cluster' => variable_get('gsl_map_cluster', FALSE),
+    'map_cluster_grid' => variable_get('gsl_map_cluster_grid', 50),
+    'map_cluster_zoom' => variable_get('gsl_cluster_zoom_limit', 10),
+    'viewport_manage' => variable_get('gsl_viewport', FALSE),
+    'viewport_marker_limit' => variable_get('gsl_marker_zoom_limit', 10),
+    'map_long' => variable_get('gsl_map_long', '-100'),
+    'map_lat' => variable_get('gsl_map_lat', '40'),
+    'items_per_panel' => variable_get('gsl_items_per_panel', 10),
+    'loc_aware' => variable_get('gsl_loc_aware', '0'),
+    'search_label' => variable_get('gsl_search_label', "Where are you?"),
   );
 
   $marker_icon_fid = variable_get('gsl_marker_icon', '');
 
   // Add the zoom setting if location awareness is enabled.
-  if ($loc_aware == '1') {
+  if ($variables['loc_aware'] == '1') {
     $variables['loc_aware_zoom'] = variable_get('gsl_loc_aware_zoom');
   }
 
@@ -382,6 +375,7 @@ function theme_google_store_locator_contents($variables) {
 
   $settings = array(
     'datapath' => $variables['data_path'],
+    'dataCacheEnabled' => $variables['data_cache_enabled'],
     'mapzoom' => intval($variables['map_zoom']),
     'mapcluster' => intval($variables['map_cluster']),
     'mapclusterzoom' => intval($variables['map_cluster_zoom']),

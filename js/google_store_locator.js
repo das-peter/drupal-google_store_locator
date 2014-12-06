@@ -90,8 +90,9 @@
     this.parent.call(this);
 
     // initialize variables
-    this._stores = [];
     this._datapath = datapath;
+    this._stores = [];
+    this._storesCache = [];
 
     // The parent class calls this but sets this.firstCallback_ in it's
     // getStores() which would be minified and is now overridden by a custom
@@ -112,6 +113,64 @@
   // Correct the constructor pointer
   Drupal.GSL.dataSource.prototype.constructor = Drupal.GSL.dataSource;
 
+  /**
+   * Retrieves the parsed stores cached for a given url.
+   */
+  Drupal.GSL.dataSource.prototype.getStoresCache = function(url) {
+    for (var i in this._storesCache) {
+      if (this._storesCache[i].url == url) {
+        return ('stores' in this._storesCache[i]) ? this._storesCache[i].stores : [];
+      }
+    }
+
+    return [];
+  }
+
+  /**
+   * Retrieves the parsed stores cached for a given url.
+   */
+  Drupal.GSL.dataSource.prototype.getStoresCacheIndex = function(url) {
+    for (var i in this._storesCache) {
+      if (this._storesCache[i].url == url) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
+  /**
+   * Sets the parsed stores cached for a given url.
+   */
+  Drupal.GSL.dataSource.prototype.setStoresCache = function(url, stores) {
+    if (this._storesCache.length == 3) {
+      var expiredCache = this._storesCache.shift();
+    }
+
+    this._storesCache.push({'url': url, 'stores': stores});
+    return this;
+  }
+
+  /**
+   * Sets the parsed stores cached for a given url.
+   */
+  Drupal.GSL.dataSource.prototype.clearStoresCache = function(url) {
+    if (url) {
+      var urlIndex = this.getStoresCacheIndex(url);
+      if (urlIndex > -1) {
+        this._storesCache.splice(urlIndex, 1);
+      }
+    }
+    else {
+      this._storesCache = [];
+    }
+
+    return this;
+  }
+
+  /**
+   * Overrides getStores().
+   */
   Drupal.GSL.dataSource.prototype.getStores = function(bounds, features, callback) {
     // Prevent race condition - if getStores is called before stores are
     // loaded.
@@ -124,11 +183,13 @@
     //  return;
     // }
 
-    var markerClusterEnabled = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapcluster'];
-    var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
+    var gslSettings = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid];
+    var dataCacheEnabled = gslSettings['dataCacheEnabled'];
+    var markerClusterEnabled = gslSettings['mapcluster'];
+    var markerClusterZoom = gslSettings['mapclusterzoom'];
     var switchToMarkerCluster = (Drupal.GSL.currentMap.getZoom() < markerClusterZoom);
-    var viewportEnabled = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['viewportManage'];
-    var viewportMarkerLimit = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['viewportMarkerLimit'];
+    var viewportEnabled = gslSettings['viewportManage'];
+    var viewportMarkerLimit = gslSettings['viewportMarkerLimit'];
     var viewportNoMarkers = (Drupal.GSL.currentMap.getZoom() < viewportMarkerLimit);
 
     if ((markerClusterEnabled && switchToMarkerCluster && !$.isEmptyObject(Drupal.GSL.currentCluster)) || (viewportEnabled && viewportNoMarkers)) {
@@ -170,26 +231,50 @@
     }
 
     var that = this;
-    // Loading all stores can take a while, display a loading overlay.
-    if ($("#cluster-loading").length == 0) {
-      $('#' + Drupal.GSL.currentMap.mapid).append('<div id="cluster-loading" class="ajax-progress ajax-progress-throbber"><div>' + Drupal.t('Loading') + '<span class="throbber"></span></div></div>');
-    }
-    $.getJSON(url, function(json) {
-      //defining our success handler, i.e. if the path we're passing to $.getJSON
-      //is legit and returns a JSON file then this runs.
 
-      // These will be either all stores, or those within the viewport.
-      var parsedStores = that.parseStores_(json);
-      $("#cluster-loading").remove();
+    var cachedStores = this.getStoresCache(url);
+    if (dataCacheEnabled && cachedStores.length > 0) {
+      // If cache is enabled and url in cache.
+      this.processParsedStores(cachedStores, bounds, features, callback);
+    }
+    else {
+      // Loading all stores can take a while, display a loading overlay.
+      if ($("#cluster-loading").length == 0) {
+        $('#' + Drupal.GSL.currentMap.mapid).append('<div id="cluster-loading" class="ajax-progress ajax-progress-throbber"><div>' + Drupal.t('Loading') + '<span class="throbber"></span></div></div>');
+      }
+      $.getJSON(url, function(json) {
+        //defining our success handler, i.e. if the path we're passing to $.getJSON
+        //is legit and returns a JSON file then this runs.
+
+        // These will be either all stores, or those within the viewport.
+        var parsedStores = that.parseStores_(json);
+        that.setStoresCache(url, parsedStores);
+        that.processParsedStores(parsedStores, bounds, features, callback);
+        $("#cluster-loading").remove();
+      });
+    }
+  };
+
+  /**
+   * Process parsed stores.
+   */
+  Drupal.GSL.dataSource.prototype.processParsedStores = function(stores, bounds, features, callback) {
+    if (stores && stores.length > 0) {
+      var that = this;
+      var gslSettings = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid];
+      var markerClusterEnabled = gslSettings['mapcluster'];
+      var markerClusterZoom = gslSettings['mapclusterzoom'];
+      var switchToMarkerCluster = (Drupal.GSL.currentMap.getZoom() < markerClusterZoom);
 
       // Filter stores for features.
       var filtered_stores = [];
-      for (var i = 0, store; store = parsedStores[i]; i++) {
+      for (var i = 0, store; store = stores[i]; i++) {
         if (store.hasAllFeatures(features)) {
           filtered_stores.push(store);
         }
       }
-      that.sortByDistance_(bounds.getCenter(), filtered_stores);
+
+      this.sortByDistance_(bounds.getCenter(), filtered_stores);
 
       if (markerClusterEnabled && switchToMarkerCluster) {
         if ($.isEmptyObject(Drupal.GSL.currentCluster)) {
@@ -199,8 +284,8 @@
 
       // The callback sets the stores on the main object.
       callback(filtered_stores);
-    });
-  };
+    }
+  }
 
   /**
    * Overridden: Sorts a list of given stores by distance from a point in ascending order.
