@@ -36,7 +36,8 @@
       markerOptions.map = Drupal.GSL.currentMap;
     }
 
-    var marker = Drupal.GSL.homeMarker = new google.maps.Marker(markerOptions);
+    var marker = new google.maps.Marker(markerOptions);
+    Drupal.GSL.setHomeMarker(marker);
 
     // And reverse geocode.
     $.get("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latLng.toUrlValue() + "&sensor=true",

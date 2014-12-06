@@ -1,6 +1,84 @@
 ;(function ($, Drupal, window, document, undefined) {
   // module global namespace
   Drupal.GSL = Drupal.GSL || {};
+  Drupal.GSL.homeMarkers = Drupal.GSL.homeMarkers || [];
+
+  Drupal.GSL.currentMap = Drupal.GSL.currentMap || {};
+  Drupal.GSL.currentCluster = Drupal.GSL.currentCluster || {};
+
+  /**
+   * Set the current map.
+   */
+  Drupal.GSL.setCurrentMap = function(map, mapid) {
+    Drupal.GSL.currentMap = map;
+    Drupal.GSL.currentMap.mapid = mapid;
+  }
+
+  /**
+   * Get the current map
+   */
+  Drupal.GSL.getCurrentMap = function(view) {
+    if (view) {
+      return view.getMap();
+    }
+
+    return Drupal.GSL.currentMap || {};
+  }
+
+  /**
+   * Remove a marker from the map.
+   */
+  Drupal.GSL.removeMarker = function(marker) {
+    if (marker instanceof google.maps.Marker) {
+      marker.setMap(null);
+      marker.unbindAll();
+    }
+  }
+
+  /**
+   * Returns the most recent home marker.
+   */
+  Drupal.GSL.getHomeMarker = function() {
+    if (Drupal.GSL.homeMarkers.length) {
+      var homeMarker = Drupal.GSL.homeMarkers[Drupal.GSL.homeMarkers.length - 1]
+      if (homeMarker && (homeMarker instanceof google.maps.Marker)) {
+        return homeMarker;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Set the home marker.
+   */
+  Drupal.GSL.setHomeMarker = function(marker) {
+    Drupal.GSL.removeHomeMarker();
+    Drupal.GSL.homeMarkers.push(marker);
+  }
+
+  /**
+   * Remove a marker from the map.
+   */
+  Drupal.GSL.updateHomeMarker = function(map) {
+    if (Drupal.GSL.homeMarkers.length) {
+      for (var i = 0; i < Drupal.GSL.homeMarkers.length; i++) {
+        Drupal.GSL.homeMarkers[i].setMap(map);
+      }
+    }
+  }
+
+  /**
+   * Remove a marker from the map.
+   */
+  Drupal.GSL.removeHomeMarker = function() {
+    if (Drupal.GSL.homeMarkers.length) {
+      for (var i = 0; i < Drupal.GSL.homeMarkers.length; i++) {
+         Drupal.GSL.removeMarker(Drupal.GSL.homeMarkers[i]);
+      }
+
+      Drupal.GSL.homeMarkers = [];
+    }
+  }
 
   /**
    * @extends storeLocator.StaticDataFeed
@@ -366,8 +444,9 @@
     // Set before stores loop so it can be used for distance calculations.
     // Use home marker if exists and is on a map, else
     var originLatLng = null;
-    if (Drupal.GSL.homeMarker) {
-      originLatLng = Drupal.GSL.homeMarker.getPosition();
+    var homeMarker = Drupal.GSL.getHomeMarker();
+    if (homeMarker) {
+      originLatLng = homeMarker.getPosition();
     }
     else {
       originLatLng = map.getCenter();
@@ -476,28 +555,27 @@
   *   Returns true if marker was updated.
   */
   Drupal.GSL.Panel.prototype.updateHomeMarker = function() {
+    // TODO: this should be specific the this view's map.
     var locationValue = $('input','.storelocator-filter').val();
-    var view = this.get('view');
 
     // If the location value is empty.
     if (!locationValue.length) {
-      // Clear original marker.
-      if (Drupal.GSL.homeMarker) {
-        Drupal.GSL.homeMarker.setMap(null);
-        Drupal.GSL.homeMarker.unbindAll();
-        delete Drupal.GSL.homeMarker;
-        return true;
-      }
-
-      return false;
+      // Clear the home marker.
+      Drupal.GSL.removeHomeMarker();
+      return true;
     }
 
+    var view = this.get('view');
+    var markerMap = Drupal.GSL.getCurrentMap(view);
+    var homeMarker = Drupal.GSL.getHomeMarker();
     var showMarker = Drupal.settings.gsl && Drupal.settings.gsl.display_search_marker;
 
     // Skip if marker is the same.
-    if (Drupal.GSL.homeMarker && Drupal.GSL.homeMarker.getTitle() == locationValue && Drupal.GSL.homeMarker.getMap() == view.getMap()) {
+    if (homeMarker && homeMarker.getTitle() == locationValue && homeMarker.getMap() == markerMap) {
       return false;
     }
+
+    Drupal.GSL.removeHomeMarker();
 
     // Bring in maps geocoder
     var geo = new google.maps.Geocoder;
@@ -512,14 +590,17 @@
           icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
         };
 
-        if (showMarker && view) {
-          markerOptions.map = view.getMap();
+        if (showMarker && markerMap) {
+          markerOptions.map = markerMap;
         }
 
-        Drupal.GSL.homeMarker = new google.maps.Marker(markerOptions);
+        var marker = new google.maps.Marker(markerOptions);
         if (results[0].formatted_address) {
-          Drupal.GSL.homeMarker.setTitle(results[0].formatted_address);
+          marker.setTitle(results[0].formatted_address);
         }
+
+        Drupal.GSL.setHomeMarker(marker);
+        homeMarker = marker;
       }
     });
 
@@ -557,16 +638,6 @@
       }
     }
   };
-
-
-  //Initialize variable for
-  Drupal.GSL.currentMap = {};
-  Drupal.GSL.currentCluster = {};
-
-  Drupal.GSL.setCurrentMap = function(map, mapid) {
-    Drupal.GSL.currentMap = map;
-    Drupal.GSL.currentMap.mapid = mapid;
-  }
 
   /**
    * Create the marker cluster.
