@@ -12,7 +12,7 @@
   Drupal.GSL.setCurrentMap = function(map, mapid) {
     Drupal.GSL.currentMap = map;
     Drupal.GSL.currentMap.mapid = mapid;
-  }
+  };
 
   /**
    * Get the current map
@@ -23,7 +23,7 @@
     }
 
     return Drupal.GSL.currentMap || {};
-  }
+  };
 
   /**
    * Remove a marker from the map.
@@ -33,7 +33,7 @@
       marker.setMap(null);
       marker.unbindAll();
     }
-  }
+  };
 
   /**
    * Returns the most recent home marker.
@@ -46,7 +46,7 @@
       }
     }
     return null;
-  }
+  };
 
   /**
    * Set the home marker.
@@ -54,21 +54,21 @@
   Drupal.GSL.setHomeMarker = function(marker) {
     Drupal.GSL.removeHomeMarker();
     Drupal.GSL.homeMarkers.push(marker);
-  }
+  };
 
   /**
-   * Remove a marker from the map.
+   * Update the map for all of the home markers.
    */
-  Drupal.GSL.updateHomeMarker = function(map) {
+  Drupal.GSL.updateHomeMarkerMap = function(map) {
     if (Drupal.GSL.homeMarkers.length) {
       for (var i = 0; i < Drupal.GSL.homeMarkers.length; i++) {
         Drupal.GSL.homeMarkers[i].setMap(map);
       }
     }
-  }
+  };
 
   /**
-   * Remove a marker from the map.
+   * Remove the home marker from the map.
    */
   Drupal.GSL.removeHomeMarker = function() {
     if (Drupal.GSL.homeMarkers.length) {
@@ -78,7 +78,24 @@
 
       Drupal.GSL.homeMarkers = [];
     }
-  }
+  };
+
+  /**
+   * Get the zoom level for the home marker / location search.
+   */
+  Drupal.GSL.getHomeMarkerZoomSetting = function(map) {
+    if (Drupal.settings.gsl && Drupal.GSL.currentMap.mapid && Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]) {
+      var mapSettings = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid];
+      if (isFinite(mapSettings['loc_search_zoom'])) {
+        return mapSettings['loc_search_zoom'];
+      }
+      else if (isFinite(mapSettings['loc_aware_zoom'])) {
+        return mapSettings['loc_aware_zoom'];
+      }
+    }
+
+    return undefined;
+  };
 
   /**
    * @extends storeLocator.StaticDataFeed
@@ -124,7 +141,7 @@
     }
 
     return [];
-  }
+  };
 
   /**
    * Retrieves the parsed stores cached for a given url.
@@ -137,7 +154,7 @@
     }
 
     return -1;
-  }
+  };
 
   /**
    * Sets the parsed stores cached for a given url.
@@ -149,7 +166,7 @@
 
     this._storesCache.push({'url': url, 'stores': stores});
     return this;
-  }
+  };
 
   /**
    * Sets the parsed stores cached for a given url.
@@ -166,7 +183,7 @@
     }
 
     return this;
-  }
+  };
 
   /**
    * Overrides getStores().
@@ -285,7 +302,7 @@
       // The callback sets the stores on the main object.
       callback(filtered_stores);
     }
-  }
+  };
 
   /**
    * Overridden: Sorts a list of given stores by distance from a point in ascending order.
@@ -448,6 +465,7 @@
    */
   Drupal.GSL.Panel = function (el, opt_options) {
     this.parent = Drupal.GSL.Panel.parent;
+    this.panelElement = el;
 
     // set items per panel
     if (opt_options['items_per_panel'] && !isNaN(opt_options['items_per_panel'])) {
@@ -640,8 +658,13 @@
   *   Returns true if marker was updated.
   */
   Drupal.GSL.Panel.prototype.updateHomeMarker = function() {
-    // TODO: this should be specific the this view's map.
-    var locationValue = $('input','.storelocator-filter').val();
+    // Search for location input in the this panel.
+    var $locationInput = $('.storelocator-filter .location-search input', this.panelElement);
+
+    var locationValue = '';
+    if ($locationInput && $locationInput.length) {
+      locationValue = $locationInput.val();
+    }
 
     // If the location value is empty.
     if (!locationValue.length) {
@@ -656,7 +679,8 @@
     var showMarker = Drupal.settings.gsl && Drupal.settings.gsl.display_search_marker;
 
     // Skip if marker is the same.
-    if (homeMarker && homeMarker.getTitle() == locationValue && homeMarker.getMap() == markerMap) {
+    if (homeMarker && homeMarker.getMap() == markerMap &&
+        (homeMarker.get('locEntry') == locationValue || homeMarker.getTitle() == locationValue)) {
       return false;
     }
 
@@ -667,7 +691,7 @@
 
     // Geocode entered address location
     geo.geocode({'address':locationValue}, function(results, status) {
-      if (results.length) {
+      if (results && results.length) {
         var markerOptions = {
           position: results[0].geometry.location,
           title: locationValue,
@@ -680,12 +704,18 @@
         }
 
         var marker = new google.maps.Marker(markerOptions);
+        marker.set('locEntry', locationValue)
         if (results[0].formatted_address) {
           marker.setTitle(results[0].formatted_address);
         }
 
         Drupal.GSL.setHomeMarker(marker);
-        homeMarker = marker;
+        if (markerMap) {
+          var markerZoom = Drupal.GSL.getHomeMarkerZoomSetting();
+          if (isFinite(markerZoom)) {
+            markerMap.setZoom(markerZoom);
+          }
+        }
       }
     });
 
@@ -734,7 +764,7 @@
     var mcOptions = {gridSize: markerClusterGrid, maxZoom: Drupal.settings.gsl.max_zoom};
     // We populate it later in addStoreToMap().
     Drupal.GSL.currentCluster = new MarkerClusterer(map, [], mcOptions);
-  }
+  };
 
   /**
    * Create map on window load

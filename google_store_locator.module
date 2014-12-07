@@ -142,6 +142,15 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#required' => TRUE,
   );
 
+  $form['google_store_locator']['gsl_loc_search_zoom'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Location search zoom level'),
+    '#default_value' => variable_get('gsl_loc_search_zoom', 10),
+    '#size' => 5,
+    '#element_validate' => array('element_validate_integer'),
+    '#description' => t('The zoom level to use when a user enters a location into the panel\'s search box. Enter a value from 0-21 with 0 being the farthest distance from the earth'),
+  );
+
   if (module_exists('file')) {
     $form['google_store_locator']['gsl_marker_icon'] = array(
       '#title' => t('Marker Icon'),
@@ -331,6 +340,7 @@ function google_store_locator_default_page() {
     'map_long' => variable_get('gsl_map_long', '-100'),
     'map_lat' => variable_get('gsl_map_lat', '40'),
     'items_per_panel' => variable_get('gsl_items_per_panel', 10),
+    'loc_search_zoom' => variable_get('gsl_loc_search_zoom', NULL),
     'loc_aware' => variable_get('gsl_loc_aware', '0'),
     'search_label' => variable_get('gsl_search_label', "Where are you?"),
   );
@@ -385,6 +395,7 @@ function theme_google_store_locator_contents($variables) {
     'maplong' => $variables['map_long'],
     'maplat' => $variables['map_lat'],
     'search_label' => $variables['search_label'],
+    'loc_search_zoom' => isset($variables['loc_search_zoom']) && $variables['loc_search_zoom'] !== '' ? intval($variables['loc_search_zoom']) : NULL,
     'empty_stores_msg' => isset($variables['empty_stores_msg']) ? $variables['empty_stores_msg'] : t('There are no stores available.'),
   );
 
@@ -491,6 +502,7 @@ function google_store_locator_theme() {
         'map_long' => NULL,
         'map_lat' => NULL,
         'items_per_panel' => NULL,
+        'loc_search_zoom' => NULL,
         'loc_aware' => NULL,
         'loc_aware_zoom' => NULL,
         'search_label' => NULL,
@@ -547,6 +559,13 @@ function google_store_locator_admin_form_validate($form, &$form_state) {
   if ($form_state['values']['gsl_max_zoom'] > 21 ||
     $form_state['values']['gsl_max_zoom'] < 0) {
     form_set_error('gsl_max_zoom',
+      t('Please enter a zoom level between 0 and 21.'));
+  }
+
+  // Check that location search zoom is between 0 and 21.
+  if ($form_state['values']['gsl_loc_search_zoom'] > 21 ||
+    $form_state['values']['gsl_loc_search_zoom'] < 0) {
+    form_set_error('gsl_loc_search_zoom',
       t('Please enter a zoom level between 0 and 21.'));
   }
 
