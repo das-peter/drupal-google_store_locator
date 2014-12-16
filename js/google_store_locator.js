@@ -1,10 +1,12 @@
 ;(function ($, Drupal, window, document, undefined) {
   // module global namespace
   Drupal.GSL = Drupal.GSL || {};
-  Drupal.GSL.homeMarkers = Drupal.GSL.homeMarkers || [];
 
   Drupal.GSL.currentMap = Drupal.GSL.currentMap || {};
   Drupal.GSL.currentCluster = Drupal.GSL.currentCluster || {};
+
+  // Global Geocoder instance, for convenience.
+  Drupal.GSL.geocoder = new google.maps.Geocoder;
 
   /**
    * Set the current map.
@@ -33,68 +35,6 @@
       marker.setMap(null);
       marker.unbindAll();
     }
-  };
-
-  /**
-   * Returns the most recent home marker.
-   */
-  Drupal.GSL.getHomeMarker = function() {
-    if (Drupal.GSL.homeMarkers.length) {
-      var homeMarker = Drupal.GSL.homeMarkers[Drupal.GSL.homeMarkers.length - 1]
-      if (homeMarker && (homeMarker instanceof google.maps.Marker)) {
-        return homeMarker;
-      }
-    }
-    return null;
-  };
-
-  /**
-   * Set the home marker.
-   */
-  Drupal.GSL.setHomeMarker = function(marker) {
-    Drupal.GSL.removeHomeMarker();
-    Drupal.GSL.homeMarkers.push(marker);
-  };
-
-  /**
-   * Update the map for all of the home markers.
-   */
-  Drupal.GSL.updateHomeMarkerMap = function(map) {
-    if (Drupal.GSL.homeMarkers.length) {
-      for (var i = 0; i < Drupal.GSL.homeMarkers.length; i++) {
-        Drupal.GSL.homeMarkers[i].setMap(map);
-      }
-    }
-  };
-
-  /**
-   * Remove the home marker from the map.
-   */
-  Drupal.GSL.removeHomeMarker = function() {
-    if (Drupal.GSL.homeMarkers.length) {
-      for (var i = 0; i < Drupal.GSL.homeMarkers.length; i++) {
-         Drupal.GSL.removeMarker(Drupal.GSL.homeMarkers[i]);
-      }
-
-      Drupal.GSL.homeMarkers = [];
-    }
-  };
-
-  /**
-   * Get the zoom level for the home marker / location search.
-   */
-  Drupal.GSL.getHomeMarkerZoomSetting = function(map) {
-    if (Drupal.settings.gsl && Drupal.GSL.currentMap.mapid && Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]) {
-      var mapSettings = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid];
-      if (isFinite(mapSettings['loc_search_zoom'])) {
-        return mapSettings['loc_search_zoom'];
-      }
-      else if (isFinite(mapSettings['loc_aware_zoom'])) {
-        return mapSettings['loc_aware_zoom'];
-      }
-    }
-
-    return undefined;
   };
 
   /**
@@ -134,7 +74,7 @@
    * Retrieves the parsed stores cached for a given url.
    */
   Drupal.GSL.dataSource.prototype.getStoresCache = function(url) {
-    for (var i in this._storesCache) {
+    for (var i = 0; i < this._storesCache.length; i++) {
       if (this._storesCache[i].url == url) {
         return ('stores' in this._storesCache[i]) ? this._storesCache[i].stores : [];
       }
@@ -147,7 +87,7 @@
    * Retrieves the parsed stores cached for a given url.
    */
   Drupal.GSL.dataSource.prototype.getStoresCacheIndex = function(url) {
-    for (var i in this._storesCache) {
+    for (var i = 0; i < this._storesCache.length; i++) {
       if (this._storesCache[i].url == url) {
         return i;
       }
@@ -188,7 +128,7 @@
   /**
    * Overrides getStores().
    */
-  Drupal.GSL.dataSource.prototype.getStores = function(bounds, features, callback) {
+  Drupal.GSL.dataSource.prototype.getStores = function(bounds, features, callback, centerPoint) {
     // Prevent race condition - if getStores is called before stores are
     // loaded.
     // Parent class does this so it might be needed here.
@@ -252,7 +192,7 @@
     var cachedStores = this.getStoresCache(url);
     if (dataCacheEnabled && cachedStores.length > 0) {
       // If cache is enabled and url in cache.
-      this.processParsedStores(cachedStores, bounds, features, callback);
+      this.processParsedStores(cachedStores, bounds, features, callback, centerPoint);
     }
     else {
       // Loading all stores can take a while, display a loading overlay.
@@ -266,7 +206,7 @@
         // These will be either all stores, or those within the viewport.
         var parsedStores = that.parseStores_(json);
         that.setStoresCache(url, parsedStores);
-        that.processParsedStores(parsedStores, bounds, features, callback);
+        that.processParsedStores(parsedStores, bounds, features, callback, centerPoint);
         $("#cluster-loading").remove();
       });
     }
@@ -275,7 +215,7 @@
   /**
    * Process parsed stores.
    */
-  Drupal.GSL.dataSource.prototype.processParsedStores = function(stores, bounds, features, callback) {
+  Drupal.GSL.dataSource.prototype.processParsedStores = function(stores, bounds, features, callback, centerPoint) {
     if (stores && stores.length > 0) {
       var that = this;
       var gslSettings = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid];
@@ -291,7 +231,12 @@
         }
       }
 
-      this.sortByDistance_(bounds.getCenter(), filtered_stores);
+      if (centerPoint && (centerPoint instanceof google.maps.LatLng)) {
+        this.sortByDistance_(centerPoint, filtered_stores);
+      }
+      else {
+        this.sortByDistance_(bounds.getCenter(), filtered_stores);
+      }
 
       if (markerClusterEnabled && switchToMarkerCluster) {
         if ($.isEmptyObject(Drupal.GSL.currentCluster)) {
@@ -311,8 +256,7 @@
    * @param {google.maps.LatLng} latLng the point to sort from.
    * @param {!Array.<!storeLocator.Store>} stores  the stores to sort.
    */
-  Drupal.GSL.dataSource.prototype.sortByDistance_ = function(latLng,
-                                                             stores) {
+  Drupal.GSL.dataSource.prototype.sortByDistance_ = function(latLng, stores) {
     stores.sort(function(a, b) {
       return a.distanceTo(latLng) - b.distanceTo(latLng);
     });
@@ -341,7 +285,7 @@
     }
 
     // build all our stores
-    for (var i in json.features) {
+    for (var i = 0; i < json.features.length; i++) {
 
       var item = json.features[i];
 
@@ -464,8 +408,20 @@
    * @constructor
    */
   Drupal.GSL.Panel = function (el, opt_options) {
+    var that = this;
     this.parent = Drupal.GSL.Panel.parent;
     this.panelElement = el;
+    this.searchMarker = null;
+    this._searchIsLocked = false;
+
+    this.settings = $.extend({
+      'locationSearch': true,
+      'locationSearchLabel': 'Where are you?',
+      'featureFilter': true,
+      'directions': true,
+      'view': null
+    }, opt_options);
+
 
     // set items per panel
     if (opt_options['items_per_panel'] && !isNaN(opt_options['items_per_panel'])) {
@@ -476,11 +432,69 @@
       this.set('items_per_panel', Drupal.GSL.Panel.ITEMS_PER_PANEL_DEFAULT);
     }
 
-    // call the parent constructor (in compiled format)
-    this.parent.call(this, el, opt_options);
+    // call the parent constructor (in compiled format).
+    var parentOptions = $.extend(opt_options, {
+      'locationSearch': false,
+    });
+    this.parent.call(this, el, parentOptions);
 
     // ensure this variable is set
     this.storeList_ = $('.store-list', el);
+
+    // Get filter element if set up in parent.
+    this.filterElement = $('form.storelocator-filter', el);
+
+    if (this.filterElement.length) {
+      // Override search events to control map zoom.
+      // The base class's "geocode" listener does a fitBounds() and setZoom(13).
+      if (this.settings['locationSearch']) {
+        this.locationSearchElement = $('<div class="location-search"><h4>' + this.settings['locationSearchLabel'] + '</h4><input></div>');
+        this.filterElement.prepend(this.locationSearchElement);
+
+        if (typeof google.maps.places != 'undefined') {
+          this.initAutocomplete_();
+        }
+        else {
+          this.filterElement.submit(function() {
+            if (!that.isSearchLocked()) {
+              var searchText = $('input', that.locationSearchElement).val();
+              // Create a fake place similar to autocomplete.
+              var place = {'name': searchText};
+              google.maps.event.trigger(that, 'searchChanged', place);
+            }
+          });
+        }
+
+        // Kill default action.
+        this.filterElement.submit(function() {
+          return false;
+        });
+
+        // Add listener for searchChanged.
+        google.maps.event.addListener(this, 'searchChanged', function(place, zoom) {
+          this.searchChanged(place, zoom);
+        });
+      }
+    }
+
+    // Directions overridden since this get set in the "geocode" listener.
+    if (this.settings['directions']) {
+      this.directionsRenderer_ = new google.maps.DirectionsRenderer({
+        draggable: true
+      });
+      this.directionsService_ = new google.maps.DirectionsService;
+      this.directionsVisible_ = false;
+
+      this.directionsPanel_ = $('.directions-panel', this.el);
+      if (this.directionsPanel_.length) {
+        this.directionsPanel_.find('form')
+          .unbind('submit')
+          .submit(function() {
+            that.renderDirections_();
+            return false;
+          });
+      }
+    }
   };
 
   // Set parent class
@@ -495,7 +509,310 @@
   Drupal.GSL.Panel.ITEMS_PER_PANEL_DEFAULT = 10;
 
   /**
-   * Overridden storeLocator.Panel.prototype.stores_changed
+   * Returns the value of the map setting as passed to the Panel class.
+   */
+  Drupal.GSL.Panel.prototype.getMapSetting = function(name) {
+    if (this.settings && this.settings.mapSettings && (name in this.settings.mapSettings)) {
+      return this.settings.mapSettings[name];
+    }
+
+    return null;
+  };
+
+  /**
+   * Get the zoom level for the location search.
+   */
+  Drupal.GSL.Panel.prototype.getSearchZoomLevel = function() {
+    var searchZoom = this.getMapSetting('loc_search_zoom');
+    if (isFinite(searchZoom)) {
+      return searchZoom;
+    }
+
+    var locAwareZoom = this.getMapSetting('loc_aware_zoom');
+    if (isFinite(locAwareZoom)) {
+      return locAwareZoom;
+    }
+
+    return undefined;
+  };
+
+  /**
+   * Override initAutocomplete_()
+   */
+  Drupal.GSL.Panel.prototype.initAutocomplete_ = function() {
+    var that = this;
+    var $input = $('input', this.locationSearchElement);
+    var input = $input[0];
+
+    this.autoCompleteHandler = new google.maps.places.Autocomplete(input);
+    if (this.get('view')) {
+      this.autoCompleteHandler.bindTo('bounds', this.get('view').getMap());
+    }
+
+    // Listen for autocomplete places changed.
+    // This occurs when a user selects an item from the drop down or hits enter.
+    google.maps.event.addListener(this.autoCompleteHandler, 'place_changed', function() {
+      if (!that.isSearchLocked()) {
+        google.maps.event.trigger(that, 'searchChanged', this.getPlace());
+      }
+    });
+
+    // Register change event to catch user entry without an "enter".
+    $input.change(function(changeEvent) {
+      if (!that.isSearchLocked()) {
+        var searchText = $(this).val();
+        // Create a fake place similar to autocomplete.
+        var place = {'name': searchText};
+        google.maps.event.trigger(that, 'searchChanged', place);
+      }
+    });
+  };
+
+  /**
+   * Drupal.GSL.Panel.prototype.lockSearch
+   */
+  Drupal.GSL.Panel.prototype.lockSearch = function() {
+    this._searchIsLocked = true;
+    return this;
+  };
+
+  /**
+   * Drupal.GSL.Panel.prototype.releaseSearchLock
+   */
+  Drupal.GSL.Panel.prototype.releaseSearchLock = function() {
+    this._searchIsLocked = false;
+    return this;
+  };
+
+  /**
+   * Drupal.GSL.Panel.prototype.isSearchLocked
+   */
+  Drupal.GSL.Panel.prototype.isSearchLocked = function() {
+    return this._searchIsLocked;
+  };
+
+  /**
+   * Drupal.GSL.Panel.prototype.searchChanged
+   */
+  Drupal.GSL.Panel.prototype.searchChanged = function(place, zoomRequest) {
+    this.lockSearch();
+
+    var view = this.get('view');
+    var map = view.getMap();
+    var marker = this.getSearchMarker();
+    marker.setVisible(false);
+
+    var location = null;
+    var locationIsMapCenter = false;
+
+    if (place.geometry) {
+      // Place selected.
+      location = place.geometry.location;
+    }
+    else if (place.name) {
+      // Query for location of search text.
+      this.searchPosition(place.name);
+
+      // Return and leave any locks enabled.
+      return;
+    }
+    else if (!place.name) {
+      // Empty input - set location to map center.
+      location = map.getCenter();
+      locationIsMapCenter = true;
+    }
+
+    // Exit if no center.
+    if (!location) {
+      this.releaseSearchLock();
+      return;
+    }
+
+    // Map update.
+    view.highlight(null);
+    var mapZoom = isFinite(zoomRequest) ? zoomRequest : this.getSearchZoomLevel();
+    if (!isFinite(mapZoom)) {
+      mapZoom = 10;
+    }
+
+    map.setCenter(location);
+    if (!locationIsMapCenter) {
+      map.setZoom(mapZoom);
+    }
+
+    // Marker update.
+    if (marker) {
+      if (place.formatted_address && place.formatted_address.length) {
+        marker.setTitle(place.formatted_address);
+      }
+      else {
+        marker.setTitle(location.toString());
+      }
+
+      if (!locationIsMapCenter) {
+        marker.setPosition(location);
+        marker.setVisible(true);
+      }
+      else {
+        marker.setPosition(null);
+      }
+    }
+
+    // Directions update.
+    this.directionsFrom_ = location;
+    if (this.directionsVisible_) {
+      this.renderDirections_();
+    }
+
+    // Listen for store changes in the view.
+    // Note: in base class this was called after the view.refreshView().
+    this.listenForStoresUpdate_();
+
+    // Update store data feed for the view.
+    view.refreshView(location);
+
+    // Release any lock.
+    this.releaseSearchLock();
+  };
+
+  /**
+   * Override listenForStoresUpdate_().
+   *
+   * Triggers an update for the store list in the Panel. Will wait for stores
+   * to load asynchronously from the data source.
+   * @private
+   */
+  Drupal.GSL.Panel.prototype.listenForStoresUpdate_ = function() {
+      var that = this;
+      var view = this.get('view');
+      if (this.storesChangedListener_) {
+        google.maps.event.removeListener(this.storesChangedListener_);
+      }
+      this.storesChangedListener_ = google.maps.event.addListenerOnce(view,
+          'stores_changed', function() {
+            that.set('stores', view.get('stores'));
+          });
+  };
+
+  /**
+   * Override searchPosition().
+   * Search for the specified address.
+   * NO pan and zoom.
+   * @param {string} searchText the address to pan to.
+   */
+  Drupal.GSL.Panel.prototype.searchPosition = function(searchText) {
+    var that = this;
+
+    if (searchText && searchText.length) {
+      var request = {
+        address: searchText,
+        bounds: this.get('view').getMap().getBounds()
+      };
+
+      Drupal.GSL.geocoder.geocode(request, function(result, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          // Trigger searchChanged.
+          google.maps.event.trigger(that, 'searchChanged', result[0]);
+        }
+        else {
+          // TODO: proper error handling.
+        }
+      });
+    }
+  };
+
+  /**
+   * Get search marker.
+   * Uses existing or creates a new one if configured to show marker.
+   */
+  Drupal.GSL.Panel.prototype.getSearchMarker = function() {
+    if (!this.searchMarker || !(this.searchMarker instanceof google.maps.Marker)) {
+      this.searchMarker = null;
+      var showMarker = Drupal.settings.gsl && Drupal.settings.gsl.display_search_marker;
+      if (showMarker && this.get('view')) {
+        // Initialize marker.
+        var markerOptions = {
+          title: 'You are here',
+          // Use Google's default blue marker.
+          icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+          map: this.get('view').getMap()
+        };
+
+        this.searchMarker = new google.maps.Marker(markerOptions);
+      }
+    }
+
+    return this.searchMarker;
+  };
+
+  /**
+   * Override renderDirections_().
+   * This is needed to override "geocode" listener.
+   */
+  Drupal.GSL.Panel.prototype.renderDirections_ = function() {
+    var that = this;
+    if (!this.directionsTo_) {
+      return;
+    }
+
+    // Use search marker instead of directionsFrom_.
+    // this.directionsFrom_
+    var searchMarker = this.getSearchMarker();
+    if (!searchMarker || !searchMarker.getPosition()) {
+      return;
+    }
+
+    this.directionsFrom_ = searchMarker.getPosition();
+    var rendered = this.directionsPanel_.find('.rendered-directions').empty();
+
+    this.directionsService_.route({
+      origin: this.directionsFrom_,
+      destination: this.directionsTo_.getLocation(),
+      travelMode: google.maps['DirectionsTravelMode'].DRIVING
+    }, function(result, status) {
+      if (status != google.maps.DirectionsStatus.OK) {
+        return;
+      }
+
+      var renderer = that.directionsRenderer_;
+      renderer.setPanel(rendered[0]);
+      renderer.setMap(that.get('view').getMap());
+      renderer.setDirections(result);
+    });
+  };
+
+  /**
+   * Override hideDirections()
+   * Hides the directions panel.
+   */
+  Drupal.GSL.Panel.prototype.hideDirections = function() {
+    this.directionsVisible_ = false;
+    this.directionsPanel_.fadeOut();
+    this.featureFilter_.fadeIn();
+    this.storeList_.fadeIn();
+    this.directionsRenderer_.setMap(null);
+  };
+
+  /**
+   * Override showDirections().
+   * Shows directions to the selected store.
+   */
+  Drupal.GSL.Panel.prototype.showDirections = function() {
+    var store = this.get('selectedStore');
+    this.featureFilter_.fadeOut();
+    this.storeList_.fadeOut();
+    this.directionsPanel_.find('.directions-to').val(store.getDetails().title);
+    this.directionsPanel_.fadeIn();
+    this.renderDirections_();
+
+    this.directionsVisible_ = true;
+  };
+
+  /**
+   * Overridden storeLocator.Panel.prototype.stores_changed.
+   *
+   * Triggered when the storeLocator.View's stores property changes.
+   * See Drupal.GSL.Panel.listenForStoresUpdate_()
    */
   Drupal.GSL.Panel.prototype.stores_changed = function() {
     if (!this.get('stores')) {
@@ -541,15 +858,12 @@
       }
     }
 
-    // Updates the home marker every single time there is a refresh.
-    that.updateHomeMarker();
-
     // Set before stores loop so it can be used for distance calculations.
     // Use home marker if exists and is on a map, else
     var originLatLng = null;
-    var homeMarker = Drupal.GSL.getHomeMarker();
-    if (homeMarker) {
-      originLatLng = homeMarker.getPosition();
+    var searchMarker = this.getSearchMarker();
+    if (searchMarker && searchMarker.getPosition()) {
+      originLatLng = searchMarker.getPosition();
     }
     else {
       originLatLng = map.getCenter();
@@ -634,96 +948,84 @@
   Drupal.GSL.Panel.prototype.view_changed = function() {
     var that = this;
     this.parent.prototype.view_changed.apply(this, arguments);
+
     var view = this.get('view');
     var map = view.getMap();
 
     // Remove zoom listener to fix bug that causes the map to center on the
     // selected store after zooming.
     google.maps.event.clearListeners(map, 'zoom_changed');
-
     this.zoomListener_ = google.maps.event.addListener(map, 'zoom_changed', function() {
-      that.stores_changed();
-    });
-  }
-
- /**
-  * Semi hacky method of placing a marker for the users location.
-  * This fires everytime the map is updated.
-  *
-  * The correct method apparantly involves line 490 of panel.js and
-  * adding an event listener. I was unable to abstract how to make it work
-  * in that fashion.
-  *
-  * @return boolean
-  *   Returns true if marker was updated.
-  */
-  Drupal.GSL.Panel.prototype.updateHomeMarker = function() {
-    // Search for location input in the this panel.
-    var $locationInput = $('.storelocator-filter .location-search input', this.panelElement);
-
-    var locationValue = '';
-    if ($locationInput && $locationInput.length) {
-      locationValue = $locationInput.val();
-    }
-
-    // If the location value is empty.
-    if (!locationValue.length) {
-      // Clear the home marker.
-      Drupal.GSL.removeHomeMarker();
-      return true;
-    }
-
-    var view = this.get('view');
-    var markerMap = Drupal.GSL.getCurrentMap(view);
-    var homeMarker = Drupal.GSL.getHomeMarker();
-    var showMarker = Drupal.settings.gsl && Drupal.settings.gsl.display_search_marker;
-
-    // Skip if marker is the same.
-    if (homeMarker && homeMarker.getMap() == markerMap &&
-        (homeMarker.get('locEntry') == locationValue || homeMarker.getTitle() == locationValue)) {
-      return false;
-    }
-
-    Drupal.GSL.removeHomeMarker();
-
-    // Bring in maps geocoder
-    var geo = new google.maps.Geocoder;
-
-    // Geocode entered address location
-    geo.geocode({'address':locationValue}, function(results, status) {
-      if (results && results.length) {
-        var markerOptions = {
-          position: results[0].geometry.location,
-          title: locationValue,
-          // Use Google's default blue marker.
-          icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-        };
-
-        if (showMarker && markerMap) {
-          markerOptions.map = markerMap;
-        }
-
-        var marker = new google.maps.Marker(markerOptions);
-        marker.set('locEntry', locationValue)
-        if (results[0].formatted_address) {
-          marker.setTitle(results[0].formatted_address);
-        }
-
-        Drupal.GSL.setHomeMarker(marker);
-        if (markerMap) {
-          var markerZoom = Drupal.GSL.getHomeMarkerZoomSetting();
-          if (isFinite(markerZoom)) {
-            markerMap.setZoom(markerZoom);
-          }
-        }
+      if (!that.isSearchLocked()) {
+        that.stores_changed();
       }
     });
 
-    return true;
+    // Remove geocodelocation listener since this is implemented in GSL
+    // location aware.
+    google.maps.event.clearListeners(view, 'load');
+
+    // Re-bind autocomplete handler.
+    if (this.autoCompleteHandler) {
+      this.autoCompleteHandler.bindTo('bounds', map);
+    }
+  };
+
+  /**
+   * Returns the data feed object.
+   *
+   * New method for storeLocator.View.
+   */
+  storeLocator.View.prototype.getDataFeed = function() {
+    return this.data_ || null;
+  }
+
+  /**
+   * Override refreshView().
+   *
+   * Refresh the map's view. This will fetch new data based on the map's bounds.
+   * Note: Overriding actual base class and not extending to a new class.
+   *
+   * @param LatLng centerPoint
+   *   Optional. Set to force the stores to be sorted by distance from this
+   *   point instead of the map.getBounds().getCenter() that the base
+   *   classes implemented.
+   */
+  storeLocator.View.prototype.refreshView = function(centerPoint) {
+    var that = this;
+
+    // TODO: should this use panel.searchMarker || map center || null?
+    if (!centerPoint || typeof centerPoint == 'undefined') {
+      centerPoint = null;
+      if (this.getMap()) {
+        centerPoint = this.getMap().getCenter();
+      }
+    }
+
+    var dataFeed = this.getDataFeed();
+    if (dataFeed) {
+      dataFeed.getStores(
+        this.getMap().getBounds(),
+        this.get('featureFilter'),
+        function(stores) {
+          var oldStores = that.get('stores');
+          if (oldStores) {
+            for (var i = 0, ii = oldStores.length; i < ii; i++) {
+              google.maps.event.removeListener(
+                  oldStores[i].getMarker().clickListener_);
+            }
+          }
+          that.set('stores', stores);
+        },
+        centerPoint
+      );
+    }
   };
 
   /**
    * Override addStoreToMap() to implement marker cluster.
+   *
+   * Note: Overriding actual base class and not extending to a new class.
    *
    * Add a store to the map.
    * @param {storeLocator.Store} store the store to add.
@@ -772,13 +1074,14 @@
   Drupal.behaviors.googleStoreLocator = {
     attach: function (context, context_settings) {
 
-      // Process all maps on the page
+      // Process all maps on the page.
+      var locators = [];
       for (var mapid in Drupal.settings.gsl) {
         if (!(mapid in Drupal.settings.gsl)) {
           continue;
         }
 
-        var $container = $('#' + mapid, context);
+        var $container = $('#' + mapid, context).once('gsl-init');
         if (!$container.length) {
           continue;
         }
@@ -824,41 +1127,41 @@
           storeFeatureSet.add(storeFeature);
         }
 
+        // Create view.
         locator.view = new storeLocator.View(locator.map, locator.data, {
           markerIcon: map_settings['marker_url'],
           geolocation: false,
           features: storeFeatureSet
         });
 
+        // Set reference to data feed after view is initialized.
+        // This is needed in the overridden
+        // storeLocator.View.prototype.refreshView().
+        locator.view.set('data_', locator.data);
+
+        // Create panel.
         locator.panel = new Drupal.GSL.Panel(locator.elements.panel, {
           view: locator.view,
           items_per_panel: map_settings['items_per_panel'],
           locationSearch: true,
           locationSearchLabel: map_settings['search_label'],
-          featureFilter: true
+          featureFilter: true,
+          mapSettings: map_settings
         });
 
-        // Register a change event since Panel does not.
-        $('.storelocator-filter input', locator.elements.panel)
-          .change(function(changeEvent) {
-            var $t = $(this);
-            var panel = $t.data('panel');
-            if (panel) {
-              // Update homemarker.
-              var updated = panel.updateHomeMarker();
-
-              // Trigger stores changed since this refreshes the home marker
-              // and updates the distance calculations.
-              var view = panel.get('view');
-              if (updated && view) {
-                panel.stores_changed();
-              }
-            }
-          })
-          .data('panel', locator.panel);
+        locators.push(locator);
       } // mapid loop
 
+      // Trigger gslReady event for all locators.
+      var gslReadyEvent = jQuery.Event('gslReady');
+      gslReadyEvent.gslLocators = locators;
+      $(document).trigger(gslReadyEvent);
+
+      // Cleanup.
       locator = null;
-    }
+      locators = null;
+      gslReadyEvent = null;
+    } // /attach
   };
+
 })(jQuery, Drupal, this, this.document);

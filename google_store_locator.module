@@ -145,7 +145,7 @@ function google_store_locator_admin_form($form, &$form_state) {
   $form['google_store_locator']['gsl_loc_search_zoom'] = array(
     '#type' => 'textfield',
     '#title' => t('Location search zoom level'),
-    '#default_value' => variable_get('gsl_loc_search_zoom', 10),
+    '#default_value' => variable_get('gsl_loc_search_zoom', variable_get('gsl_loc_aware_zoom', 10)),
     '#size' => 5,
     '#element_validate' => array('element_validate_integer'),
     '#description' => t('The zoom level to use when a user enters a location into the panel\'s search box. Enter a value from 0-21 with 0 being the farthest distance from the earth'),
