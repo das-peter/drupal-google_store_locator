@@ -442,20 +442,22 @@
     this.storeList_ = $('.store-list', el);
 
     // Get filter element if set up in parent.
-    this.filterElement = $('form.storelocator-filter', el);
+    this.filterElement = this.filter_ = $('form.storelocator-filter', el);
 
-    if (this.filterElement.length) {
+    if (this.filter_.length) {
+      this.featureFilter_ = $('.feature-filter', this.filter_);
+
       // Override search events to control map zoom.
       // The base class's "geocode" listener does a fitBounds() and setZoom(13).
       if (this.settings['locationSearch']) {
-        this.locationSearchElement = $('<div class="location-search"><h4>' + this.settings['locationSearchLabel'] + '</h4><input></div>');
-        this.filterElement.prepend(this.locationSearchElement);
+        this.locationSearchElement = this.locationSearch_ = $('<div class="location-search"><h4>' + this.settings['locationSearchLabel'] + '</h4><input></div>');
+        this.filter_.prepend(this.locationSearchElement);
 
         if (typeof google.maps.places != 'undefined') {
           this.initAutocomplete_();
         }
         else {
-          this.filterElement.submit(function() {
+          this.filter_.submit(function() {
             if (!that.isSearchLocked()) {
               var searchText = $('input', that.locationSearchElement).val();
               // Create a fake place similar to autocomplete.
@@ -466,7 +468,7 @@
         }
 
         // Kill default action.
-        this.filterElement.submit(function() {
+        this.filter_.submit(function() {
           return false;
         });
 
@@ -487,6 +489,7 @@
 
       this.directionsPanel_ = $('.directions-panel', this.el);
       if (this.directionsPanel_.length) {
+        // Override form submit to be this classes function.
         this.directionsPanel_.find('form')
           .unbind('submit')
           .submit(function() {
@@ -751,9 +754,13 @@
    */
   Drupal.GSL.Panel.prototype.renderDirections_ = function() {
     var that = this;
+
     if (!this.directionsTo_) {
       return;
     }
+
+    // Clear out existing directions.
+    var rendered = this.directionsPanel_.find('.rendered-directions').empty();
 
     // Use search marker instead of directionsFrom_.
     // this.directionsFrom_
@@ -763,7 +770,6 @@
     }
 
     this.directionsFrom_ = searchMarker.getPosition();
-    var rendered = this.directionsPanel_.find('.rendered-directions').empty();
 
     this.directionsService_.route({
       origin: this.directionsFrom_,
@@ -923,6 +929,8 @@
     // store' in the panel event. We only care about the event.
     var store = this.get('selectedStore');
     if (store) {
+      this.directionsTo_ = store;
+
       // At this point all the links are added to the selected store. We should
       // first check that the Street View imagery exists: if no then disable the
       // link.
