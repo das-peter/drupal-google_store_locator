@@ -865,9 +865,6 @@
     if (searchMarker && searchMarker.getPosition()) {
       originLatLng = searchMarker.getPosition();
     }
-    else {
-      originLatLng = map.getCenter();
-    }
 
     // loop through all store values
     for (var i = 0, ii = Math.min(items_per_panel, stores.length); i < ii; i++) {
@@ -876,18 +873,24 @@
 
      // Check if proximity was desired, and if so render it.
       if (proximityEnabled) {
-        // Calculate distance to the store
+        var $distanceElement = $('.distance', storeLi);
 
-        var storeDistance = Number((stores[i].distanceTo(originLatLng) * proximityMultiplier).toFixed(2));
+        if (originLatLng) {
+          // Calculate distance to the store
+          var storeDistance = Number((stores[i].distanceTo(originLatLng) * proximityMultiplier).toFixed(2));
 
-        // add distance to HTML
-        if ($('.distance', storeLi).length > 0) {
-          //if distance field already there, change text.
-          $('.distance', storeLi).text(storeDistance + ' miles');
+          // add distance to HTML
+          if ($distanceElement.length > 0) {
+            //if distance field already there, change text.
+            $distanceElement.text(storeDistance + ' miles');
+          }
+          else {
+            // No distance field yet! APPEND full HTML!
+            $('.address', storeLi).append('<div class="distance">' + storeDistance + ' ' + metricText + '</div>');
+          }
         }
-        else {
-          // No distance field yet! APPEND full HTML!
-          $('.address', storeLi).append('<div class="distance">' + storeDistance + ' ' + metricText + '</div>');
+        else if ($distanceElement.length > 0) {
+          $distanceElement.text('');
         }
       }
 
