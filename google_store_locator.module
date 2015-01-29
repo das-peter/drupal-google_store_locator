@@ -304,7 +304,7 @@ function google_store_locator_admin_form($form, &$form_state) {
   $form['google_store_locator']['advanced']['gsl_marker_zoom_limit'] = array(
     '#type' => 'textfield',
     '#title' => t('Marker Zoom limit'),
-    '#description' => t('The maximum zoom level that markers will be displayed.') . '<br />' .
+    '#description' => t('The zoom level at which to start displaying markers. For example, if set to 5, the map must be zoomed to greater than 5 for stores to be loaded. Set to 0 to always load stores.') . '<br />' .
     t('Enter a value from 0-21 with 0 being the farthest distance from the earth'),
     '#element_validate' => array('element_validate_integer'),
     '#size' => 5,
