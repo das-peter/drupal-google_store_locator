@@ -1123,7 +1123,8 @@
           center: new google.maps.LatLng(map_settings['maplat'], map_settings['maplong']),
           zoom: map_settings['mapzoom'],
           maxZoom: Drupal.settings.gsl.max_zoom,
-          mapTypeId: map_settings['maptype'] || google.maps.MapTypeId.ROADMAP
+          mapTypeId: map_settings['maptype'] || google.maps.MapTypeId.ROADMAP,
+          styles: map_settings['map_style']
         });
 
         Drupal.GSL.setCurrentMap(locator.map, mapid);

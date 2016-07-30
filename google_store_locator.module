@@ -325,6 +325,15 @@ function google_store_locator_admin_form($form, &$form_state) {
     ),
   );
 
+  // Google Map styles.
+  $form['google_store_locator']['advanced']['gsl_map_style'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Google map style'),
+    '#description' => t('Tip: Try <a href="!url">Snazzy Maps</a> for ready to use map styles.', array('!url' => 'https://snazzymaps.com/')),
+    '#default_value' => variable_get('gsl_map_style', ''),
+    '#rows' => 5,
+  );
+
   $form = system_settings_form($form);
   $form['#submit'][] = 'google_store_locator_admin_form_submit';
 
@@ -343,6 +352,7 @@ function google_store_locator_default_page() {
     'map_cluster' => variable_get('gsl_map_cluster', FALSE),
     'map_cluster_grid' => variable_get('gsl_map_cluster_grid', 50),
     'map_cluster_zoom' => variable_get('gsl_cluster_zoom_limit', 10),
+    'map_style' => variable_get('gsl_map_style', ''),
     'viewport_manage' => variable_get('gsl_viewport', FALSE),
     'viewport_marker_limit' => variable_get('gsl_marker_zoom_limit', 10),
     'map_long' => variable_get('gsl_map_long', '-100'),
@@ -399,6 +409,7 @@ function theme_google_store_locator_contents($variables) {
     'mapcluster' => intval($variables['map_cluster']),
     'mapclusterzoom' => intval($variables['map_cluster_zoom']),
     'mapclustergrid' => intval($variables['map_cluster_grid']),
+    'map_style' => json_decode($variables['map_style']),
     'viewportManage' => $variables['viewport_manage'],
     'viewportMarkerLimit' => intval($variables['viewport_marker_limit']),
     'maplong' => $variables['map_long'],
@@ -507,6 +518,7 @@ function google_store_locator_theme() {
         'map_cluster' => NULL,
         'map_cluster_grid' => NULL,
         'map_cluster_zoom' => NULL,
+        'map_style' => NULL,
         'viewport_manage' => NULL,
         'viewport_marker_limit' => NULL,
         'map_long' => NULL,
