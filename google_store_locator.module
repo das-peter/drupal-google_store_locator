@@ -90,6 +90,14 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#size' => 30,
     '#required' => TRUE,
   );
+  $form['google_store_locator']['gsl_noresults'] = array(
+    '#type' => 'textfield',
+    '#title' => t('What should be displayed if no stores are found after searching a location?'),
+    '#description' => t('The message displayed if no stores are found after searching.'),
+    '#default_value' => variable_get('gsl_noresults', 'There are no stores in this area. However, stores closest to you are listed below.'),
+    '#size' => 70,
+    '#required' => TRUE,
+  );
 
   $form['google_store_locator']['gsl_display_search_marker'] = array(
     '#type' => 'checkbox',
@@ -343,6 +351,7 @@ function google_store_locator_default_page() {
     'loc_search_zoom' => variable_get('gsl_loc_search_zoom', NULL),
     'loc_aware' => variable_get('gsl_loc_aware', '0'),
     'search_label' => variable_get('gsl_search_label', "Where are you?"),
+    'no_results' => variable_get('gsl_noresults', 'There are no stores in this area. However, stores closest to you are listed below.'),
   );
 
   $marker_icon_fid = variable_get('gsl_marker_icon', '');
@@ -395,6 +404,7 @@ function theme_google_store_locator_contents($variables) {
     'maplong' => $variables['map_long'],
     'maplat' => $variables['map_lat'],
     'search_label' => $variables['search_label'],
+    'no_results' => $variables['no_results'],
     'loc_search_zoom' => isset($variables['loc_search_zoom']) && $variables['loc_search_zoom'] !== '' ? intval($variables['loc_search_zoom']) : NULL,
     'empty_stores_msg' => isset($variables['empty_stores_msg']) ? $variables['empty_stores_msg'] : t('There are no stores available.'),
   );
@@ -506,6 +516,7 @@ function google_store_locator_theme() {
         'loc_aware' => NULL,
         'loc_aware_zoom' => NULL,
         'search_label' => NULL,
+        'no_results' => NULL,
         'marker_path' => NULL,
         'feature_list' => NULL,
       ),

@@ -499,6 +499,7 @@ function google_store_locator_install() {
  */
 function google_store_locator_uninstall() {
   // Delete all the variables we set with system_settings_form().
+  variable_del('gsl_noresults');
   variable_del('gsl_search_label');
   variable_del('gsl_title');
   variable_del('gsl_json_path');
