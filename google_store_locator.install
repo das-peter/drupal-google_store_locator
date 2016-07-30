@@ -22,7 +22,7 @@ function google_store_locator_requirements($phase) {
         The library can be found at <a href="@url">@url</a>. Please add it to
         your library directory.',
         array(
-          '@url' => 'http://code.google.com/p/storelocator/source/checkout')
+          '@url' => 'https://github.com/googlemaps/js-store-locator.git')
         ),
         'severity' => REQUIREMENT_ERROR,
       );
@@ -44,7 +44,7 @@ function google_store_locator_requirements($phase) {
         The library can be found at <a href="@url">@url</a>. Please add it to
         your library directory.',
         array(
-          '@url' => 'http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer')
+          '@url' => 'https://github.com/googlemaps/js-marker-clusterer.git')
         ),
         'severity' => REQUIREMENT_ERROR,
       );
