@@ -737,7 +737,7 @@
         var markerOptions = {
           title: 'You are here',
           // Use Google's default blue marker.
-          icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+          icon: '//maps.google.com/mapfiles/ms/icons/blue-dot.png',
           map: this.get('view').getMap()
         };
 
