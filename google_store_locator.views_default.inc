@@ -30,16 +30,8 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'none';
   $handler->display->display_options['pager']['options']['offset'] = '0';
-  $handler->display->display_options['style_plugin'] = 'views_geojson';
-  $handler->display->display_options['style_options']['data_source']['value'] = 'wkt';
-  $handler->display->display_options['style_options']['data_source']['latitude'] = 'gsl_geofield';
-  $handler->display->display_options['style_options']['data_source']['longitude'] = 'gsl_geofield';
-  $handler->display->display_options['style_options']['data_source']['geofield'] = 'gsl_geofield';
-  $handler->display->display_options['style_options']['data_source']['wkt'] = 'gsl_geofield';
-  $handler->display->display_options['style_options']['data_source']['name_field'] = 'title';
-  $handler->display->display_options['style_options']['data_source']['description_field'] = 'gsl_addressfield';
-  $handler->display->display_options['style_options']['jsonp_prefix'] = '';
-  $handler->display->display_options['style_options']['using_views_api_mode'] = 0;
+  $handler->display->display_options['style_plugin'] = 'default';
+  $handler->display->display_options['row_plugin'] = 'fields';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -73,19 +65,23 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['fields']['gsl_feature_filter_list']['id'] = 'gsl_feature_filter_list';
   $handler->display->display_options['fields']['gsl_feature_filter_list']['table'] = 'field_data_gsl_feature_filter_list';
   $handler->display->display_options['fields']['gsl_feature_filter_list']['field'] = 'gsl_feature_filter_list';
+  $handler->display->display_options['fields']['gsl_feature_filter_list']['label'] = 'gsl_feature_filter_list_rendered';
   $handler->display->display_options['fields']['gsl_feature_filter_list']['delta_offset'] = '0';
   /* Field: Content: Misc. Properties */
   $handler->display->display_options['fields']['gsl_props_misc']['id'] = 'gsl_props_misc';
   $handler->display->display_options['fields']['gsl_props_misc']['table'] = 'field_data_gsl_props_misc';
   $handler->display->display_options['fields']['gsl_props_misc']['field'] = 'gsl_props_misc';
+  $handler->display->display_options['fields']['gsl_props_misc']['label'] = 'gsl_props_misc_rendered';
   /* Field: Content: Store Phone */
   $handler->display->display_options['fields']['gsl_props_phone']['id'] = 'gsl_props_phone';
   $handler->display->display_options['fields']['gsl_props_phone']['table'] = 'field_data_gsl_props_phone';
   $handler->display->display_options['fields']['gsl_props_phone']['field'] = 'gsl_props_phone';
+  $handler->display->display_options['fields']['gsl_props_phone']['label'] = 'gsl_props_phone_rendered';
   /* Field: Content: Store Website */
   $handler->display->display_options['fields']['gsl_props_web']['id'] = 'gsl_props_web';
   $handler->display->display_options['fields']['gsl_props_web']['table'] = 'field_data_gsl_props_web';
   $handler->display->display_options['fields']['gsl_props_web']['field'] = 'gsl_props_web';
+  $handler->display->display_options['fields']['gsl_props_web']['label'] = 'gsl_props_web_rendered';
   /* Field: Content: Nid */
   $handler->display->display_options['fields']['nid']['id'] = 'nid';
   $handler->display->display_options['fields']['nid']['table'] = 'node';
@@ -126,9 +122,20 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['filters']['status']['field'] = 'status';
   $handler->display->display_options['filters']['status']['value'] = '1';
 
-  /* Display: Page */
-  $handler = $view->new_display('page', 'Page', 'page');
-  $handler->display->display_options['defaults']['hide_admin_links'] = FALSE;
+  /* Display: Feed */
+  $handler = $view->new_display('feed', 'Feed', 'feed');
+  $handler->display->display_options['pager']['type'] = 'none';
+  $handler->display->display_options['pager']['options']['offset'] = '0';
+  $handler->display->display_options['style_plugin'] = 'views_geojson_feed';
+  $handler->display->display_options['style_options']['data_source']['value'] = 'wkt';
+  $handler->display->display_options['style_options']['data_source']['latitude'] = 'gsl_geofield';
+  $handler->display->display_options['style_options']['data_source']['longitude'] = 'gsl_geofield';
+  $handler->display->display_options['style_options']['data_source']['geofield'] = 'gsl_geofield';
+  $handler->display->display_options['style_options']['data_source']['wkt'] = 'gsl_geofield';
+  $handler->display->display_options['style_options']['data_source']['name_field'] = 'title';
+  $handler->display->display_options['style_options']['data_source']['description_field'] = 'gsl_addressfield';
+  $handler->display->display_options['style_options']['jsonp_prefix'] = '';
+  $handler->display->display_options['style_options']['using_views_api_mode'] = 0;
   $handler->display->display_options['path'] = 'store-locator/json';
   $translatables['google_store_locator_json_export'] = array(
     t('Master'),

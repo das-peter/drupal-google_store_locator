@@ -68,7 +68,7 @@ INSTALLATION:
     -geofield
     -libraries
     -views
-    -views_geojson
+    -views_geojson (>=7.x-1.0-beta2)
 
 OPTIONAL:
 Config settings for both options are under the 'Advanced' section on the main
