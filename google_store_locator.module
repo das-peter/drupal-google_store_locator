@@ -255,7 +255,10 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#default_value' => variable_get('gsl_map_cluster', FALSE),
     '#description' => t("WARNING: Using this option alone won't necessarily improve performance when viewing >1k markers. To improve performance use this in conjunction with Viewport Marker Management. (see the README.txt)"),
   );
-  $markerclusterer_exist = (file_exists(libraries_get_path('markerclusterer') . '/src/markerclusterer_compiled.js'));
+
+  // Module is backward compatible with markerclusterer_compiled.js.
+  $markerclusterer_exist = (file_exists(libraries_get_path('markerclusterer') . '/src/markerclusterer_compiled.js') ||
+      file_exists(libraries_get_path('markerclusterer') . '/src/markerclusterer.js'));
   if (!$markerclusterer_exist) {
     $form['google_store_locator']['advanced']['gsl_map_cluster']['#value'] = FALSE;
     $form['google_store_locator']['advanced']['gsl_map_cluster']['#disabled'] = TRUE;
@@ -480,7 +483,16 @@ function theme_google_store_locator_contents($variables) {
 
   $markerclusterer_path = libraries_get_path('markerclusterer');
   if ($markerclusterer_path) {
-    $output['compiled_js']['#attached']['js'][] = $markerclusterer_path . '/src/markerclusterer_compiled.js';
+    // Module is backward compatible with markerclusterer_compiled.js.
+    $markerclusterer_exist = (file_exists($markerclusterer_path . '/src/markerclusterer.js'));
+    if ($markerclusterer_exist) {
+      $markerclusterer_file = $markerclusterer_path . '/src/markerclusterer.js';
+    }
+    else {
+      $markerclusterer_file = $markerclusterer_path . '/src/markerclusterer_compiled.js';
+    }
+
+    $output['compiled_js']['#attached']['js'][] = $markerclusterer_file;
   }
 
   // Add the location awareness js if it's enabled.
