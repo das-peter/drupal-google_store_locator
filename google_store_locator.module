@@ -256,9 +256,7 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#description' => t("WARNING: Using this option alone won't necessarily improve performance when viewing >1k markers. To improve performance use this in conjunction with Viewport Marker Management. (see the README.txt)"),
   );
 
-  // Module is backward compatible with markerclusterer_compiled.js.
-  $markerclusterer_exist = (file_exists(libraries_get_path('markerclusterer') . '/src/markerclusterer_compiled.js') ||
-      file_exists(libraries_get_path('markerclusterer') . '/src/markerclusterer.js'));
+  $markerclusterer_exist = (bool) google_store_locator_get_markerclusterer_js();
   if (!$markerclusterer_exist) {
     $form['google_store_locator']['advanced']['gsl_map_cluster']['#value'] = FALSE;
     $form['google_store_locator']['advanced']['gsl_map_cluster']['#disabled'] = TRUE;
@@ -481,18 +479,8 @@ function theme_google_store_locator_contents($variables) {
     ),
   );
 
-  $markerclusterer_path = libraries_get_path('markerclusterer');
-  if ($markerclusterer_path) {
-    // Module is backward compatible with markerclusterer_compiled.js.
-    $markerclusterer_exist = (file_exists($markerclusterer_path . '/src/markerclusterer.js'));
-    if ($markerclusterer_exist) {
-      $markerclusterer_file = $markerclusterer_path . '/src/markerclusterer.js';
-    }
-    else {
-      $markerclusterer_file = $markerclusterer_path . '/src/markerclusterer_compiled.js';
-    }
-
-    $output['compiled_js']['#attached']['js'][] = $markerclusterer_file;
+  if ($markerclusterer_js = google_store_locator_get_markerclusterer_js()) {
+    $output['compiled_js']['#attached']['js'][] = $markerclusterer_js;
   }
 
   // Add the location awareness js if it's enabled.
@@ -620,4 +608,27 @@ function google_store_locator_admin_form_validate($form, &$form_state) {
     form_set_error('gsl_map_lat',
     t('Please enter a latitude between -90 and 90'));
   }
+}
+
+/**
+ * Checks if the markerclusterer library is available.
+ *
+ * Checks if the JS library markerclusterer is available in the libraries path
+ * and returns the path to the file if found.
+ * Checks for the new and the old naming of the library.
+ *
+ * @retrun string|FALSE
+ *   Returns the path to the JS library or FALSE if the library isn't available.
+ */
+function google_store_locator_get_markerclusterer_js() {
+  if ($markerclusterer_path = libraries_get_path('markerclusterer')) {
+    if (file_exists($markerclusterer_path . '/src/markerclusterer.js')) {
+      return $markerclusterer_path . '/src/markerclusterer.js';
+    }
+    elseif (file_exists($markerclusterer_path . '/src/markerclusterer_compiled.js')) {
+      return $markerclusterer_path . '/src/markerclusterer_compiled.js';
+    }
+  }
+
+  return FALSE;
 }
