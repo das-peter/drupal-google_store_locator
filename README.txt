@@ -64,8 +64,8 @@ INSTALLATION:
 
 2) Download and enable the module and all dependencies. Required modules are:
     -addressfield
-    -geocoder
-    -geofield
+    -geocoder (requires entity)
+    -geofield (requires geoPHP)
     -libraries
     -views
     -views_geojson (>=7.x-1.0-beta2)

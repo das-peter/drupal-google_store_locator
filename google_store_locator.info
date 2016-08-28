@@ -5,6 +5,7 @@ package = Commerce (contrib)
 php = 5.2.4
 dependencies[] = addressfield
 dependencies[] = ctools
+dependencies[] = entity
 dependencies[] = geocoder
 dependencies[] = geofield
 dependencies[] = libraries
