@@ -602,8 +602,10 @@
 
     var view = this.get('view');
     var map = view.getMap();
-    var marker = this.getSearchMarker();
-    marker.setVisible(false);
+    var searchMarker = this.getSearchMarker();
+    if (searchMarker && searchMarker.getPosition()) {
+      searchMarker.setVisible(false);
+    }
 
     var location = null;
     var locationIsMapCenter = false;
@@ -644,20 +646,20 @@
     }
 
     // Marker update.
-    if (marker) {
+    if (searchMarker) {
       if (place.formatted_address && place.formatted_address.length) {
-        marker.setTitle(place.formatted_address);
+        searchMarker.setTitle(place.formatted_address);
       }
       else {
-        marker.setTitle(location.toString());
+        searchMarker.setTitle(location.toString());
       }
 
       if (!locationIsMapCenter) {
-        marker.setPosition(location);
-        marker.setVisible(true);
+        searchMarker.setPosition(location);
+        searchMarker.setVisible(true);
       }
       else {
-        marker.setPosition(null);
+        searchMarker.setPosition(null);
       }
     }
 
