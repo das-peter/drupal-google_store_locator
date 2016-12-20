@@ -12,3 +12,4 @@ dependencies[] = libraries
 dependencies[] = views
 dependencies[] = views_geojson (>=7.x-1.0-beta2)
 dependencies[] = list
+configure = admin/config/search/google_store_locator
