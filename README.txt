@@ -70,6 +70,11 @@ INSTALLATION:
     -views
     -views_geojson (>=7.x-1.0-beta2)
 
+3) Get a Google Maps API key in
+https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en
+and set the value in Google Store Locator administration page
+(admin/config/search/google_store_locator)
+
 OPTIONAL:
 Config settings for both options are under the 'Advanced' section on the main
 config page.

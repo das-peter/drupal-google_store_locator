@@ -74,6 +74,28 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#type' => 'item',
     '#title' => t('Google Store Locator Administrator Settings'),
   );
+
+  if (!module_exists('keys')) {
+    $form['google_store_locator']['gsl_google_api_key'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Google Maps API key'),
+      '#description' => t(
+        'Google Maps requires an API key to ensure you can use all features. !link.',
+        array('!link' => l('Get API key', 'https://developers.google.com/maps/documentation/javascript/get-api-key?hl=en', array('attributes' => array('target' => '_blank'))))
+      ),
+      '#default_value' => variable_get('gsl_google_api_key', NULL),
+      '#size' => 50,
+      '#required' => TRUE,
+    );
+  }
+  else {
+    $form['google_store_locator']['gsl_google_api_key'] = array(
+      '#type' => 'item',
+      '#title' => t('Google Maps API key'),
+      '#markup' => t('Managed by <a href="@url">Keys</a>.', array('@url' => url('admin/config/keys/settings'))),
+    );
+  }
+
   $form['google_store_locator']['gsl_title'] = array(
     '#type' => 'textfield',
     '#title' => t('What should the title be?'),
@@ -438,7 +460,7 @@ function theme_google_store_locator_contents($variables) {
   $output = array(
     'google_maps_api' => array(
       '#attached' => array(
-        'js' => array('//maps.googleapis.com/maps/api/js?sensor=false&libraries=places' => array('type' => 'external')),
+        'js' => array('//maps.googleapis.com/maps/api/js?key=' . google_store_locator_get_google_api_key() . '&libraries=places' => array('type' => 'external')),
       ),
     ),
     // Module is backward compatible with path js/store-locator.compiled.js.
@@ -631,4 +653,22 @@ function google_store_locator_get_markerclusterer_js() {
   }
 
   return FALSE;
+}
+
+/**
+ * Retrieve the Google Maps key that is in use for the site.
+ *
+ * Integrates with keys module.
+ * If this module is not available, the config variable gsl_google_api_key will
+ * be used.
+ *
+ * @return string|FALSE
+ *   The API Key or FALSE if none is set.
+ */
+function google_store_locator_get_google_api_key() {
+  $key = variable_get('gsl_google_api_key', FALSE);
+  if (module_exists('keys')) {
+    $key = keys_get_key('google_maps');
+  }
+  return $key;
 }
