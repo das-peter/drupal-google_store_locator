@@ -478,8 +478,8 @@ function theme_google_store_locator_contents($variables) {
     'maplong' => $variables['map_long'],
     'maplat' => $variables['map_lat'],
     'search_label' => $variables['search_label'],
-    'no_results' => $variables['no_results'],
-    'no_results_in_view' => $variables['no_results_in_view'],
+    'no_results' => isset($variables['no_results']) ? $variables['no_results'] : t('There are no stores available.'),
+    'no_results_in_view' => isset($variables['no_results_in_view']) ? $variables['no_results_in_view'] : t('There are no stores in this area. However, stores closest to you are listed below.'),
     'loc_search_zoom' => isset($variables['loc_search_zoom']) && $variables['loc_search_zoom'] !== '' ? intval($variables['loc_search_zoom']) : 10,
   );
 
