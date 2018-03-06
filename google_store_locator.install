@@ -500,6 +500,7 @@ function google_store_locator_install() {
 function google_store_locator_uninstall() {
   // Delete all the variables we set with system_settings_form().
   variable_del('gsl_noresults');
+  variable_del('gsl_noresults_in_view');
   variable_del('gsl_search_label');
   variable_del('gsl_title');
   variable_del('gsl_json_path');
@@ -610,4 +611,16 @@ function google_store_locator_update_7103() {
   );
   variable_set('contextual_range_filter_numeric_field_names', $contextual_range_filter_numeric);
   return t('Contextual Range filter variables set.');
+}
+
+/**
+ * Updated variable names for naming consistency.
+ */
+function google_store_locator_update_7104() {
+  // If gsl_noresults is set - "rename" it to gsl_noresults_in_view and remove
+  // it to allow default to take over.
+  if (($label = variable_get('gsl_noresults', NULL)) && !is_null($label)) {
+    variable_set('gsl_noresults_in_view', $label);
+    variable_del('gsl_noresults');
+  }
 }

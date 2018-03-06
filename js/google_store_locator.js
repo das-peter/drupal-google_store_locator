@@ -836,9 +836,9 @@
     this.storeList_.empty();
 
     if (!stores.length) {
-      this.storeList_.append('<li class="no-stores">' + Drupal.t('There are no stores in this area.') + '</li>');
+      this.storeList_.append('<li class="no-stores">' + Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['no_results'] + '</li>');
     } else if (bounds && !bounds.contains(stores[0].getLocation())) {
-      this.storeList_.append('<li class="no-stores">' + Drupal.t('@msg', {'@msg': Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['no_results']}) + '</li>');
+      this.storeList_.append('<li class="no-stores">' + Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['no_results_in_view'] + '</li>');
     }
 
     var clickHandler = function() {

@@ -112,11 +112,19 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#size' => 30,
     '#required' => TRUE,
   );
-  $form['google_store_locator']['gsl_noresults'] = array(
+  $form['google_store_locator']['gsl_noresults_in_view'] = array(
     '#type' => 'textfield',
     '#title' => t('What should be displayed if no stores are found after searching a location?'),
     '#description' => t('The message displayed if no stores are found after searching.'),
-    '#default_value' => variable_get('gsl_noresults', 'There are no stores in this area. However, stores closest to you are listed below.'),
+    '#default_value' => variable_get('gsl_noresults_in_view', 'There are no stores in this area. However, stores closest to you are listed below.'),
+    '#size' => 70,
+    '#required' => TRUE,
+  );
+  $form['google_store_locator']['gsl_noresults'] = array(
+    '#type' => 'textfield',
+    '#title' => t('What should be displayed if no stores are available?'),
+    '#description' => t('The message displayed if no stores are available or when loading the data failed.'),
+    '#default_value' => variable_get('gsl_noresults', 'There are no stores available.'),
     '#size' => 70,
     '#required' => TRUE,
   );
@@ -369,22 +377,23 @@ function google_store_locator_admin_form($form, &$form_state) {
  */
 function google_store_locator_default_page() {
   $variables = array(
-    'data_path' => variable_get('gsl_json_path', 'store-locator/json'),
-    'data_cache_enabled' => variable_get('gsl_data_cache_enabled', TRUE),
-    'map_zoom' => variable_get('gsl_map_zoom', '4'),
-    'map_cluster' => variable_get('gsl_map_cluster', FALSE),
-    'map_cluster_grid' => variable_get('gsl_map_cluster_grid', 50),
-    'map_cluster_zoom' => variable_get('gsl_cluster_zoom_limit', 10),
-    'map_style' => variable_get('gsl_map_style', ''),
-    'viewport_manage' => variable_get('gsl_viewport', FALSE),
-    'viewport_marker_limit' => variable_get('gsl_marker_zoom_limit', 10),
-    'map_long' => variable_get('gsl_map_long', '-100'),
-    'map_lat' => variable_get('gsl_map_lat', '40'),
-    'items_per_panel' => variable_get('gsl_items_per_panel', 10),
-    'loc_search_zoom' => variable_get('gsl_loc_search_zoom', NULL),
-    'loc_aware' => variable_get('gsl_loc_aware', '0'),
-    'search_label' => variable_get('gsl_search_label', "Where are you?"),
-    'no_results' => variable_get('gsl_noresults', 'There are no stores in this area. However, stores closest to you are listed below.'),
+    'data_path' => filter_xss(variable_get('gsl_json_path', 'store-locator/json')),
+    'data_cache_enabled' => (bool) variable_get('gsl_data_cache_enabled', TRUE),
+    'map_zoom' => (int) variable_get('gsl_map_zoom', '4'),
+    'map_cluster' => (bool) variable_get('gsl_map_cluster', FALSE),
+    'map_cluster_grid' => (int) variable_get('gsl_map_cluster_grid', 50),
+    'map_cluster_zoom' => (int) variable_get('gsl_cluster_zoom_limit', 10),
+    'map_style' => filter_xss(variable_get('gsl_map_style', '')),
+    'viewport_manage' => (bool) variable_get('gsl_viewport', FALSE),
+    'viewport_marker_limit' => (int) variable_get('gsl_marker_zoom_limit', 10),
+    'map_long' => (float) variable_get('gsl_map_long', '-100'),
+    'map_lat' => (float) variable_get('gsl_map_lat', '40'),
+    'items_per_panel' => (int) variable_get('gsl_items_per_panel', 10),
+    'loc_search_zoom' => (int) variable_get('gsl_loc_search_zoom', NULL),
+    'loc_aware' => (int) variable_get('gsl_loc_aware', '0'),
+    'search_label' => filter_xss(variable_get('gsl_search_label', 'Where are you?')),
+    'no_results' => filter_xss(variable_get('gsl_noresults', 'There are no stores available.')),
+    'no_results_in_view' => filter_xss(variable_get('gsl_noresults_in_view', 'There are no stores in this area. However, stores closest to you are listed below.')),
   );
 
   $marker_icon_fid = variable_get('gsl_marker_icon', '');
@@ -439,8 +448,8 @@ function theme_google_store_locator_contents($variables) {
     'maplat' => $variables['map_lat'],
     'search_label' => $variables['search_label'],
     'no_results' => $variables['no_results'],
-    'loc_search_zoom' => isset($variables['loc_search_zoom']) && $variables['loc_search_zoom'] !== '' ? intval($variables['loc_search_zoom']) : NULL,
-    'empty_stores_msg' => isset($variables['empty_stores_msg']) ? $variables['empty_stores_msg'] : t('There are no stores available.'),
+    'no_results_in_view' => $variables['no_results_in_view'],
+    'loc_search_zoom' => isset($variables['loc_search_zoom']) && $variables['loc_search_zoom'] !== '' ? intval($variables['loc_search_zoom']) : 10,
   );
 
   if (!empty($variables['items_per_panel'])) {
