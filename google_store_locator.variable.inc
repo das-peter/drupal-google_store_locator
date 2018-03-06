@@ -42,7 +42,7 @@ function google_store_locator_variable_info($options) {
   $variable['gsl_noresults'] = array(
     'type' => 'string',
     'title' => t('What should be displayed if no stores are available?', array(), $options),
-    'description' => t('The message displayed if no stores are available e.h. when loading the data failed.', array(), $options),
+    'description' => t('The message displayed if no stores are available and when loading the data failed.', array(), $options),
     'default' => 'There are no stores available.',
     'required' => TRUE,
     'localize' => TRUE,
