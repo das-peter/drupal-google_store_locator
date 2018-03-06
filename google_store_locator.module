@@ -66,6 +66,90 @@ function google_store_locator_menu() {
 }
 
 /**
+ * Implements hook_block_info().
+ */
+function google_store_locator_block_info() {
+  $blocks['gsl_block'] = array(
+    'info' => t('Google Store Locator'),
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function google_store_locator_block_view($delta) {
+  $block = array();
+  switch ($delta) {
+    case 'gsl_block':
+      $block['content'] = google_store_locator_fetch_map();
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Callback function for /store_locator in hook_menu().
+ */
+function google_store_locator_default_page() {
+  return google_store_locator_fetch_map();
+}
+
+/**
+ * Fetches the rendered map, ready for displaying.
+ */
+function google_store_locator_fetch_map() {
+  $variables = array(
+    'data_path' => variable_get('gsl_json_path', 'store-locator/json'),
+    'data_cache_enabled' => variable_get('gsl_data_cache_enabled', TRUE),
+    'map_zoom' => variable_get('gsl_map_zoom', '4'),
+    'map_cluster' => variable_get('gsl_map_cluster', FALSE),
+    'map_cluster_grid' => variable_get('gsl_map_cluster_grid', 50),
+    'map_cluster_zoom' => variable_get('gsl_cluster_zoom_limit', 10),
+    'map_style' => variable_get('gsl_map_style', ''),
+    'viewport_manage' => variable_get('gsl_viewport', FALSE),
+    'viewport_marker_limit' => variable_get('gsl_marker_zoom_limit', 10),
+    'map_long' => variable_get('gsl_map_long', '-100'),
+    'map_lat' => variable_get('gsl_map_lat', '40'),
+    'items_per_panel' => variable_get('gsl_items_per_panel', 10),
+    'loc_search_zoom' => variable_get('gsl_loc_search_zoom', NULL),
+    'loc_aware' => variable_get('gsl_loc_aware', '0'),
+    'search_label' => variable_get('gsl_search_label', "Where are you?"),
++    'no_results' => variable_get('gsl_noresults', 'There are no stores in this area. However, tores closest to you are listed below.'),
+  );
+
+  $marker_icon_fid = variable_get('gsl_marker_icon', '');
+
+  // Add the zoom setting if location awareness is enabled.
+  if ($variables['loc_aware'] == '1') {
+    $variables['loc_aware_zoom'] = variable_get('gsl_loc_aware_zoom');
+  }
+
+  if (!empty($marker_icon_fid)) {
+    $marker_file = file_load($marker_icon_fid);
+    $variables['marker_path'] = $marker_file->uri;
+  }
+
+  // Add the feature list if some exist.
+  $feature_field = field_info_field('gsl_feature_filter_list');
+  if (isset($feature_field)) {
+    $feature_list = list_allowed_values($feature_field);
+    if (!empty($feature_list)) {
+      // Need to sanitize the keys and labels returned from
+      // list_allowed_values().
+      foreach ($feature_list as $key => $label) {
+        $skey = field_filter_xss($key);
+        $variables['feature_list'][$skey] = field_filter_xss($label);
+      }
+    }
+  }
+
+  return theme('google_store_locator_contents', $variables);
+}
+
+
+/**
  * Create admin form for Google Store Locator.
  */
 function google_store_locator_admin_form($form, &$form_state) {
@@ -371,59 +455,6 @@ function google_store_locator_admin_form($form, &$form_state) {
   return $form;
 }
 
-
-/**
- * Callback function for /store_locator in hook_menu().
- */
-function google_store_locator_default_page() {
-  $variables = array(
-    'data_path' => filter_xss(variable_get('gsl_json_path', 'store-locator/json')),
-    'data_cache_enabled' => (bool) variable_get('gsl_data_cache_enabled', TRUE),
-    'map_zoom' => (int) variable_get('gsl_map_zoom', '4'),
-    'map_cluster' => (bool) variable_get('gsl_map_cluster', FALSE),
-    'map_cluster_grid' => (int) variable_get('gsl_map_cluster_grid', 50),
-    'map_cluster_zoom' => (int) variable_get('gsl_cluster_zoom_limit', 10),
-    'map_style' => filter_xss(variable_get('gsl_map_style', '')),
-    'viewport_manage' => (bool) variable_get('gsl_viewport', FALSE),
-    'viewport_marker_limit' => (int) variable_get('gsl_marker_zoom_limit', 10),
-    'map_long' => (float) variable_get('gsl_map_long', '-100'),
-    'map_lat' => (float) variable_get('gsl_map_lat', '40'),
-    'items_per_panel' => (int) variable_get('gsl_items_per_panel', 10),
-    'loc_search_zoom' => (int) variable_get('gsl_loc_search_zoom', NULL),
-    'loc_aware' => (int) variable_get('gsl_loc_aware', '0'),
-    'search_label' => filter_xss(variable_get('gsl_search_label', 'Where are you?')),
-    'no_results' => filter_xss(variable_get('gsl_noresults', 'There are no stores available.')),
-    'no_results_in_view' => filter_xss(variable_get('gsl_noresults_in_view', 'There are no stores in this area. However, stores closest to you are listed below.')),
-  );
-
-  $marker_icon_fid = variable_get('gsl_marker_icon', '');
-
-  // Add the zoom setting if location awareness is enabled.
-  if ($variables['loc_aware'] == '1') {
-    $variables['loc_aware_zoom'] = variable_get('gsl_loc_aware_zoom');
-  }
-
-  if (!empty($marker_icon_fid)) {
-    $marker_file = file_load($marker_icon_fid);
-    $variables['marker_path'] = $marker_file->uri;
-  }
-
-  // Add the feature list if some exist.
-  $feature_field = field_info_field('gsl_feature_filter_list');
-  if (isset($feature_field)) {
-    $feature_list = list_allowed_values($feature_field);
-    if (!empty($feature_list)) {
-      // Need to sanitize the keys and labels returned from
-      // list_allowed_values().
-      foreach ($feature_list as $key => $label) {
-        $skey = field_filter_xss($key);
-        $variables['feature_list'][$skey] = field_filter_xss($label);
-      }
-    }
-  }
-
-  return theme('google_store_locator_contents', $variables);
-}
 
 /**
  * Default implementation of the google_store_locator_contents theme hook.
