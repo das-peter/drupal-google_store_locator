@@ -116,7 +116,7 @@ function google_store_locator_fetch_map() {
     'loc_search_zoom' => variable_get('gsl_loc_search_zoom', NULL),
     'loc_aware' => variable_get('gsl_loc_aware', '0'),
     'search_label' => variable_get('gsl_search_label', "Where are you?"),
-+    'no_results' => variable_get('gsl_noresults', 'There are no stores in this area. However, tores closest to you are listed below.'),
+    'no_results' => variable_get('gsl_noresults', 'There are no stores in this area. However, tores closest to you are listed below.'),
   );
 
   $marker_icon_fid = variable_get('gsl_marker_icon', '');
