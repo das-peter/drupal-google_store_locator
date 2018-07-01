@@ -62,8 +62,12 @@
           msg = "Location detection not supported in browser";
       }
 
-      // Does this element even exist?
-      document.getElementById('info').innerHTML = msg;
+      // To show the error message, render a div containing ID 'info'.
+      var info = document.getElementById('info');
+
+      if (info !== null) {
+        info.innerHTML = msg;
+      }
     }
 
     // Get the user's current position.
