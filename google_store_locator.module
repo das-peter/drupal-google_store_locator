@@ -365,6 +365,12 @@ function google_store_locator_admin_form($form, &$form_state) {
         ':input[name="gsl_loc_aware"]' => array('checked' => TRUE)),
     ),
   );
+  $form['google_store_locator']['advanced']['gsl_lang_aware'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use enabled language for the map controls'),
+    '#description' => t('If your site is multilingual (or use a language other than English as primary language) this will pass on the user\'s active language setting when requesting the map from google, translating various map controls.'),
+    '#default_value' => variable_get('gsl_lang_aware', FALSE),
+  );
   $form['google_store_locator']['advanced']['gsl_map_cluster'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable marker clustering'),
@@ -478,6 +484,8 @@ function google_store_locator_admin_form($form, &$form_state) {
  * section of the page and generates the map and panel elements.
  */
 function theme_google_store_locator_contents($variables) {
+  global $language;
+
   $gsl_map_id = drupal_html_id('google-store-locator-map-container');
 
   $settings = array(
@@ -511,12 +519,18 @@ function theme_google_store_locator_contents($variables) {
     $settings['feature_list'] = $variables['feature_list'];
   }
 
+  $map_language = '';
+
+  if (variable_get('gsl_lang_aware', FALSE)) {
+    $map_language = format_string('&language=!langcode', array('!langcode' => $language->language));
+  }
+
   $storelocator_path = libraries_get_path('storelocator');
 
   $output = array(
     'google_maps_api' => array(
       '#attached' => array(
-        'js' => array('//maps.googleapis.com/maps/api/js?key=' . google_store_locator_get_google_api_key() . '&libraries=places' => array('type' => 'external')),
+        'js' => array('//maps.googleapis.com/maps/api/js?key=' . google_store_locator_get_google_api_key() . '&libraries=places' . $map_language => array('type' => 'external')),
       ),
     ),
     // Module is backward compatible with path js/store-locator.compiled.js.
