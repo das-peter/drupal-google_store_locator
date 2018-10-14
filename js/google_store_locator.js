@@ -279,9 +279,17 @@
    * @return {!Array.<!storeLocator.Store>}
    */
   Drupal.GSL.dataSource.prototype.parseStores_ = function(json) {
+    var gslSettings = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid];
+    var resulLinkTarget = gslSettings['link_target'];
+
     var stores = [];
     if (!('features' in json)) {
       return stores;
+    }
+
+    // Prepare for usage during output creation.
+    if (resulLinkTarget) {
+      resulLinkTarget = ' target="' + resulLinkTarget + '" rel="noopener noreferrer"';
     }
 
     // build all our stores
@@ -374,8 +382,16 @@
               break;
 
             case "gsl_props_web_rendered":
-              var url = itemFeatures.gsl_props_web_rendered.split(',');
-              storeProps.web = '<a href="' + url[1] + '">' + url[0] + '</a>';
+              var urlArray = itemFeatures.gsl_props_web_rendered.split(',');
+              var textLink, link;
+              if (urlArray.length > 1) {
+                textLink = urlArray[0];
+                link = urlArray[1];
+              }
+              else {
+                textLink = link = urlArray[0];
+              }
+              storeProps.web = '<a href="' + link + '"' + resulLinkTarget + '>' + textLink + '</a>';
               break;
 
           }
