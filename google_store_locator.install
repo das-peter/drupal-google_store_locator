@@ -25,6 +25,7 @@ function google_store_locator_requirements($phase) {
           '@url' => 'https://github.com/googlemaps/js-store-locator.git')
         ),
         'severity' => REQUIREMENT_ERROR,
+        'value' => $t('Google Store Locator Library Missing'),
       );
     }
     else {
@@ -42,11 +43,12 @@ function google_store_locator_requirements($phase) {
         'The Marker Clusterer library is missing, and is required to enable
           the marker clustering option.
         The library can be found at <a href="@url">@url</a>. Please add it to
-        your library directory.',
+        your library directory if you wish to enable marker clustering.',
         array(
           '@url' => 'https://github.com/googlemaps/js-marker-clusterer.git')
         ),
-        'severity' => REQUIREMENT_ERROR,
+        'severity' => REQUIREMENT_INFO,
+        'value' => $t('Marker Clusterer Library Missing'),
       );
     }
     else {
@@ -63,11 +65,13 @@ function google_store_locator_requirements($phase) {
         'description' => $t(
         'The Views Contextual Range Filter is required to enable Viewport Marker
           Management. The module can be found at <a href="@url">@url</a>. Please
-          download and enable it.',
+          download and enable it if you wish to enable Viewport Marker
+          Management.',
         array(
           '@url' => 'https://drupal.org/project/contextual_range_filter')
         ),
-        'severity' => REQUIREMENT_ERROR,
+        'severity' => REQUIREMENT_INFO,
+        'value' => $t('Views Contextual Range Filter Module Missing'),
       );
     }
     else {
