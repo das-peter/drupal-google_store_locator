@@ -890,7 +890,7 @@
           // add distance to HTML
           if ($distanceElement.length > 0) {
             //if distance field already there, change text.
-            $distanceElement.text(storeDistance + ' miles');
+            $distanceElement.text(storeDistance + ' ' + metricText);
           }
           else {
             // No distance field yet! APPEND full HTML!
