@@ -1076,7 +1076,12 @@
     var map = Drupal.GSL.currentMap;
     var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
     var markerClusterGrid = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclustergrid'];
-    var mcOptions = {gridSize: markerClusterGrid, maxZoom: Drupal.settings.gsl.max_zoom};
+    var markerClusterImagePath = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterimagepath'];
+    var mcOptions = {
+      gridSize: markerClusterGrid,
+      imagePath: markerClusterImagePath,
+      maxZoom: Drupal.settings.gsl.max_zoom
+    };
     // We populate it later in addStoreToMap().
     Drupal.GSL.currentCluster = new MarkerClusterer(map, [], mcOptions);
   };
