@@ -736,8 +736,13 @@
           // Trigger searchChanged.
           google.maps.event.trigger(that, 'searchChanged', result[0]);
         }
+        else if (status == google.maps.GeocoderStatus.ZERO_RESULTS) {
+          // Trigger searchChanged - despite not having results.
+          google.maps.event.trigger(that, 'searchChanged', {name: false, geometry: false});
+        }
         else {
-          // TODO: proper error handling.
+          // Ensure all locks are lifted.
+          that.releaseSearchLock();
         }
       });
     }
