@@ -530,15 +530,15 @@ function theme_google_store_locator_contents($variables) {
   $output = array(
     'google_maps_api' => array(
       '#attached' => array(
-        'js' => array('//maps.googleapis.com/maps/api/js?key=' . google_store_locator_get_google_api_key() . '&libraries=places' . $map_language => array('type' => 'external')),
+        'js' => array('//maps.googleapis.com/maps/api/js?key=' . google_store_locator_get_google_api_key() . '&libraries=places' . $map_language => array('type' => 'external', 'group' => JS_LIBRARY)),
       ),
     ),
     // Module is backward compatible with path js/store-locator.compiled.js.
     'compiled_js' => array(
       '#attached' => array(
         'js' => (file_exists($storelocator_path . '/dist/store-locator.min.js')) ?
-            array($storelocator_path . '/dist/store-locator.min.js') :
-            array($storelocator_path . '/js/store-locator.compiled.js'),
+            array($storelocator_path . '/dist/store-locator.min.js' => array('group' => JS_LIBRARY, 'weight' => 1, 'type' => 'file')) :
+            array($storelocator_path . '/js/store-locator.compiled.js' => array('group' => JS_LIBRARY, 'weight' => 1, 'type' => 'file')),
       ),
     ),
     'build_js' => array(
