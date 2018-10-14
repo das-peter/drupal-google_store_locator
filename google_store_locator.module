@@ -467,7 +467,7 @@ function theme_google_store_locator_contents($variables) {
   $gsl_map_id = drupal_html_id('google-store-locator-map-container');
 
   $settings = array(
-    'datapath' => $variables['data_path'],
+    'datapath' => url($variables['data_path']),
     'dataCacheEnabled' => $variables['data_cache_enabled'],
     'mapzoom' => intval($variables['map_zoom']),
     'mapcluster' => intval($variables['map_cluster']),
