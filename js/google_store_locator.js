@@ -417,6 +417,7 @@
     this.settings = $.extend({
       'locationSearch': true,
       'locationSearchLabel': 'Where are you?',
+      'locationSearchPlaceholder': 'Enter a location',
       'featureFilter': true,
       'directions': true,
       'view': null
@@ -450,7 +451,7 @@
       // Override search events to control map zoom.
       // The base class's "geocode" listener does a fitBounds() and setZoom(13).
       if (this.settings['locationSearch']) {
-        this.locationSearchElement = this.locationSearch_ = $('<div class="location-search"><h4>' + this.settings['locationSearchLabel'] + '</h4><input></div>');
+        this.locationSearchElement = this.locationSearch_ = $('<div class="location-search"><h4>' + this.settings['locationSearchLabel'] + '</h4><input placeholder="' + this.settings['locationSearchPlaceholder'] + '"></div>');
         this.filter_.prepend(this.locationSearchElement);
 
         if (typeof google.maps.places != 'undefined') {
@@ -1164,6 +1165,7 @@
           items_per_panel: map_settings['items_per_panel'],
           locationSearch: true,
           locationSearchLabel: map_settings['search_label'],
+          locationSearchPlaceholder: map_settings['search_placeholder'],
           featureFilter: true,
           mapSettings: map_settings
         });

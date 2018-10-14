@@ -117,6 +117,7 @@ function google_store_locator_fetch_map() {
     'loc_search_zoom' => (int) variable_get('gsl_loc_search_zoom', NULL),
     'loc_aware' => (int) variable_get('gsl_loc_aware', '0'),
     'search_label' => filter_xss(variable_get('gsl_search_label', "Where are you?")),
+    'search_placeholder' => filter_xss(variable_get('gsl_search_placeholder', 'Enter a location')),
     'no_results' => filter_xss(variable_get('gsl_noresults', 'There are no stores available.')),
     'no_results_in_view' => filter_xss(variable_get('gsl_noresults_in_view', 'There are no stores in this area. However, stores closest to you are listed below.')),
   );
@@ -195,6 +196,14 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#title' => t('What should the search label say?'),
     '#description' => t('The label shown above the search input box.'),
     '#default_value' => variable_get('gsl_search_label', 'Where are you?'),
+    '#size' => 30,
+    '#required' => TRUE,
+  );
+  $form['google_store_locator']['gsl_search_placeholder'] = array(
+    '#type' => 'textfield',
+    '#title' => t('What should the search box placeholder say?'),
+    '#description' => t('The placeholder shown inside the search input box.'),
+    '#default_value' => variable_get('gsl_search_placeholder', 'Enter a location'),
     '#size' => 30,
     '#required' => TRUE,
   );
@@ -502,6 +511,7 @@ function theme_google_store_locator_contents($variables) {
     'maplong' => $variables['map_long'],
     'maplat' => $variables['map_lat'],
     'search_label' => $variables['search_label'],
+    'search_placeholder' => $variables['search_placeholder'],
     'no_results' => isset($variables['no_results']) ? $variables['no_results'] : t('There are no stores available.'),
     'no_results_in_view' => isset($variables['no_results_in_view']) ? $variables['no_results_in_view'] : t('There are no stores in this area. However, stores closest to you are listed below.'),
     'loc_search_zoom' => isset($variables['loc_search_zoom']) && $variables['loc_search_zoom'] !== '' ? intval($variables['loc_search_zoom']) : 10,
@@ -626,6 +636,7 @@ function google_store_locator_theme() {
         'loc_aware' => NULL,
         'loc_aware_zoom' => NULL,
         'search_label' => NULL,
+        'search_placeholder' => NULL,
         'no_results' => NULL,
         'marker_path' => NULL,
         'feature_list' => NULL,

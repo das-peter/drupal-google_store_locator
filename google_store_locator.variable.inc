@@ -30,6 +30,15 @@ function google_store_locator_variable_info($options) {
     'localize' => TRUE,
     'group' => 'google_store_locator',
   );
+  $variable['gsl_search_placeholder'] = array(
+    'type' => 'string',
+    'title' => t('What should the search box placeholder say?', array(), $options),
+    'description' => t('The placeholder shown inside the search input box.', array(), $options),
+    'default' => 'Enter a location',
+    'required' => TRUE,
+    'localize' => TRUE,
+    'group' => 'google_store_locator',
+  );
   $variable['gsl_noresults_in_view'] = array(
     'type' => 'string',
     'title' => t('What should be displayed if no stores are found after searching a location?', array(), $options),
