@@ -107,7 +107,7 @@ function google_store_locator_fetch_map() {
     'map_cluster' => (bool) variable_get('gsl_map_cluster', FALSE),
     'map_cluster_grid' => (int) variable_get('gsl_map_cluster_grid', 50),
     'map_cluster_zoom' => (int) variable_get('gsl_cluster_zoom_limit', 10),
-    'map_cluster_image_path' => variable_get('gsl_cluster_image_path', libraries_get_path('markerclusterer') . '/images/m'),
+    'map_cluster_image_path' => variable_get('gsl_cluster_image_path', '/' . libraries_get_path('markerclusterer') . '/images/m'),
     'map_style' => filter_xss(variable_get('gsl_map_style', '')),
     'viewport_manage' => (bool) variable_get('gsl_viewport', FALSE),
     'viewport_marker_limit' => (int) variable_get('gsl_marker_zoom_limit', 10),
@@ -456,7 +456,7 @@ function google_store_locator_admin_form($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Path the the cluster images'),
     '#description' => t('Path to the cluster images ([1-5].png)'),
-    '#default_value' => variable_get('gsl_cluster_image_path', libraries_get_path('markerclusterer') . '/images/m'),
+    '#default_value' => variable_get('gsl_cluster_image_path', '/' . libraries_get_path('markerclusterer') . '/images/m'),
     '#states' => array(
       'visible' => array(
         ':input[name="gsl_map_cluster"]' => array('checked' => TRUE)),
