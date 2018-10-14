@@ -66,6 +66,7 @@ function google_store_locator_views_default_views() {
   $handler->display->display_options['fields']['gsl_feature_filter_list']['table'] = 'field_data_gsl_feature_filter_list';
   $handler->display->display_options['fields']['gsl_feature_filter_list']['field'] = 'gsl_feature_filter_list';
   $handler->display->display_options['fields']['gsl_feature_filter_list']['label'] = 'gsl_feature_filter_list_rendered';
+  $handler->display->display_options['fields']['gsl_feature_filter_list']['type'] = 'list_key';
   $handler->display->display_options['fields']['gsl_feature_filter_list']['delta_offset'] = '0';
   /* Field: Content: Misc. Properties */
   $handler->display->display_options['fields']['gsl_props_misc']['id'] = 'gsl_props_misc';

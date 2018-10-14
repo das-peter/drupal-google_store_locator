@@ -1158,7 +1158,7 @@
         // Loop through the feature list and add each from the admin provided allowed values.
         for(var feature in feature_list) {
           // Mimic the id creation we did when parsing the stores.
-          var id = feature_list[feature].replace(/\s/g,'');
+          var id = feature.replace(/\s/g,'');
           var storeFeature = new storeLocator.Feature(id, feature_list[feature]);
           storeFeatureSet.add(storeFeature);
         }

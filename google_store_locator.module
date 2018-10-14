@@ -138,7 +138,14 @@ function google_store_locator_fetch_map() {
   // Add the feature list if some exist.
   $feature_field = field_info_field('gsl_feature_filter_list');
   if (isset($feature_field)) {
-    $feature_list = list_allowed_values($feature_field);
+    // Use the i18n integration if available.
+    if (module_exists('i18n_field')  && ($translate = i18n_field_type_info($feature_field['type'], 'translate_options'))) {
+      $feature_list = $translate($feature_field);
+    }
+    else {
+      // Defaults to list_default behavior
+      $feature_list = list_allowed_values($feature_field);
+    }
     if (!empty($feature_list)) {
       // Need to sanitize the keys and labels returned from
       // list_allowed_values().
