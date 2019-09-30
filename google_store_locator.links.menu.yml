@@ -1,0 +1,5 @@
+google_store_locator.configuration:
+  title: 'Google Store Locator'
+  description: 'Manage global Google Store Locator settings.'
+  route_name: google_store_locator.configuration
+  parent: system.admin_config_search

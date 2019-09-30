@@ -1,0 +1,29 @@
+search_label: 'Where are you?'
+search_placeholder: 'Enter a location'
+noresults_in_view: 'There are no stores in this area. However, stores closest to you are listed below.'
+noresults: 'There are no stores available.'
+display_search_marker: false
+web_link_target: ''
+web_link_custom_target: ''
+items_per_panel: 10
+map_lat: 40
+map_long: -100
+map_zoom: 4
+max_zoom: 16
+loc_search_zoom: 10
+marker_icon: ''
+proximity_enabled: false
+proximity_metric: 'km'
+json_path: '/store-locator/json'
+data_cache_enabled: true
+display_path: '/store-locator'
+loc_aware: false
+loc_aware_zoom:
+lang_aware: true
+map_cluster: true
+map_cluster_grid: 50
+cluster_zoom_limit: 10
+cluster_image_path: '/libraries/js-marker-clusterer/images/m'
+viewport: false
+marker_zoom_limit: 10
+map_style: ''

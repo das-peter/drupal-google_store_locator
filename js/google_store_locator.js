@@ -1,12 +1,12 @@
-;(function ($, Drupal, window, document, undefined) {
+(function ($, Drupal, drupalSettings) {
+
+  'use strict';
+
   // module global namespace
   Drupal.GSL = Drupal.GSL || {};
 
   Drupal.GSL.currentMap = Drupal.GSL.currentMap || {};
   Drupal.GSL.currentCluster = Drupal.GSL.currentCluster || {};
-
-  // Global Geocoder instance, for convenience.
-  Drupal.GSL.geocoder = new google.maps.Geocoder;
 
   /**
    * Set the current map.
@@ -140,7 +140,7 @@
     //  return;
     // }
 
-    var gslSettings = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid];
+    var gslSettings = drupalSettings.gsl[Drupal.GSL.currentMap.mapid];
     var dataCacheEnabled = gslSettings['dataCacheEnabled'];
     var markerClusterEnabled = gslSettings['mapcluster'];
     var markerClusterZoom = gslSettings['mapclusterzoom'];
@@ -218,7 +218,7 @@
   Drupal.GSL.dataSource.prototype.processParsedStores = function(stores, bounds, features, callback, centerPoint) {
     if (stores && stores.length > 0) {
       var that = this;
-      var gslSettings = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid];
+      var gslSettings = drupalSettings.gsl[Drupal.GSL.currentMap.mapid];
       var markerClusterEnabled = gslSettings['mapcluster'];
       var markerClusterZoom = gslSettings['mapclusterzoom'];
       var switchToMarkerCluster = (Drupal.GSL.currentMap.getZoom() < markerClusterZoom);
@@ -279,7 +279,7 @@
    * @return {!Array.<!storeLocator.Store>}
    */
   Drupal.GSL.dataSource.prototype.parseStores_ = function(json) {
-    var gslSettings = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid];
+    var gslSettings = drupalSettings.gsl[Drupal.GSL.currentMap.mapid];
     var resulLinkTarget = gslSettings['link_target'];
 
     var stores = [];
@@ -755,7 +755,7 @@
   Drupal.GSL.Panel.prototype.getSearchMarker = function() {
     if (!this.searchMarker || !(this.searchMarker instanceof google.maps.Marker)) {
       this.searchMarker = null;
-      var showMarker = Drupal.settings.gsl && Drupal.settings.gsl.display_search_marker;
+      var showMarker = drupalSettings.gsl && drupalSettings.gsl.display_search_marker;
       if (showMarker && this.get('view')) {
         // Initialize marker.
         var markerOptions = {
@@ -858,9 +858,9 @@
     this.storeList_.empty();
 
     if (!stores.length) {
-      this.storeList_.append('<li class="no-stores">' + Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['no_results'] + '</li>');
+      this.storeList_.append('<li class="no-stores">' + drupalSettings.gsl[Drupal.GSL.currentMap.mapid]['no_results'] + '</li>');
     } else if (bounds && !bounds.contains(stores[0].getLocation())) {
-      this.storeList_.append('<li class="no-stores">' + Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['no_results_in_view'] + '</li>');
+      this.storeList_.append('<li class="no-stores">' + drupalSettings.gsl[Drupal.GSL.currentMap.mapid]['no_results_in_view'] + '</li>');
     }
 
     var clickHandler = function() {
@@ -874,11 +874,11 @@
 
     // Set proximity variables.
     var metricText, proximityMultiplier;
-    var proximityEnabled = Drupal.settings.gsl.proximity;
+    var proximityEnabled = drupalSettings.gsl.proximity;
     if (proximityEnabled) {
       // Determine if the user wants values converted to MI or KM.
       // As the base value is in KM, apply a multiplier for KM to MI if desired.
-      if (Drupal.settings.gsl.metric == 'mi'){
+      if (drupalSettings.gsl.metric == 'mi'){
         proximityMultiplier = .621371;
         metricText = 'miles';
       }
@@ -1077,8 +1077,8 @@
 
     if (marker.getMap() != this.getMap()) {
       // Marker hasn't been added to the map before. Decide what to do with it.
-      var markerClusterEnabled = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapcluster'];
-      var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
+      var markerClusterEnabled = drupalSettings.gsl[Drupal.GSL.currentMap.mapid]['mapcluster'];
+      var markerClusterZoom = drupalSettings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
       var switchToMarkerCluster = (Drupal.GSL.currentMap.getZoom() < markerClusterZoom);
       if (markerClusterEnabled && switchToMarkerCluster) {
         // Marker is added to the cluster.
@@ -1096,32 +1096,30 @@
    */
   Drupal.GSL.initializeCluster = function (stores, that) {
     var map = Drupal.GSL.currentMap;
-    var markerClusterZoom = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
-    var markerClusterGrid = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclustergrid'];
-    var markerClusterImagePath = Drupal.settings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterimagepath'];
+    var markerClusterZoom = drupalSettings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterzoom'];
+    var markerClusterGrid = drupalSettings.gsl[Drupal.GSL.currentMap.mapid]['mapclustergrid'];
+    var markerClusterImagePath = drupalSettings.gsl[Drupal.GSL.currentMap.mapid]['mapclusterimagepath'];
     var mcOptions = {
       gridSize: markerClusterGrid,
       imagePath: markerClusterImagePath,
-      maxZoom: Drupal.settings.gsl.max_zoom
+      maxZoom: drupalSettings.gsl.max_zoom
     };
     // We populate it later in addStoreToMap().
     Drupal.GSL.currentCluster = new MarkerClusterer(map, [], mcOptions);
   };
 
   /**
-   * Create map on window load
+   * Create map on google maps api callback or drupal attach event.
    */
   Drupal.behaviors.googleStoreLocator = {
     attach: function (context, context_settings) {
+      // Global Geocoder instance, for convenience.
+      Drupal.GSL.geocoder = new google.maps.Geocoder;
 
       // Process all maps on the page.
       var locators = [];
-      for (var mapid in Drupal.settings.gsl) {
-        if (!(mapid in Drupal.settings.gsl)) {
-          continue;
-        }
-
-        var $container = $('#' + mapid, context).once('gsl-init');
+      for (var mapid in drupalSettings.gsl) {
+        var $container = $('#' + mapid).once('gsl-init');
         if (!$container.length) {
           continue;
         }
@@ -1136,7 +1134,7 @@
           continue;
         }
 
-        var map_settings = Drupal.settings.gsl[mapid];
+        var map_settings = drupalSettings.gsl[mapid];
         var locator = {};
 
         // Get data
@@ -1151,7 +1149,7 @@
           // Default center on North America.
           center: new google.maps.LatLng(map_settings['maplat'], map_settings['maplong']),
           zoom: map_settings['mapzoom'],
-          maxZoom: Drupal.settings.gsl.max_zoom,
+          maxZoom: drupalSettings.gsl.max_zoom,
           mapTypeId: map_settings['maptype'] || google.maps.MapTypeId.ROADMAP,
           styles: map_settings['map_style']
         });
@@ -1206,4 +1204,4 @@
     } // /attach
   };
 
-})(jQuery, Drupal, this, this.document);
+})(jQuery, Drupal, drupalSettings);

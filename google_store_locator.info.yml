@@ -1,0 +1,15 @@
+name: 'Google Store Locator'
+description: 'Provides a panel and map canvas for displaying your store locations'
+core: 8.x
+package: 'Google Store Locator'
+configure: google_store_locator.configuration
+dependencies:
+  addressfield: 'drupal:address'
+  entity: 'drupal:entity'
+  geocoder: 'drupal:geocoder'
+  geofield: 'drupal:geofield'
+  libraries: 'drupal:libraries'
+  views: 'drupal:views'
+  'views_geojson (>=7.x-1.0-beta2)': 'views_geojson (>=7.x-1.0-beta2):views_geojson (>=7.x-1.0-beta2)'
+  text: 'drupal:text'
+type: module

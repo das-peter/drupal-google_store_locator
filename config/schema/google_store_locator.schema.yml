@@ -1,0 +1,101 @@
+gsl.settings:
+  type: config_object
+  mapping:
+    google_api_key:
+      type: string
+      label: 'Google Maps API key'
+    title:
+      type: string
+      label: 'What should the title be?'
+      translatable: true
+    search_label:
+      type: string
+      label: 'What should the search label say?'
+      translatable: true
+    search_placeholder:
+      type: string
+      label: 'What should the search box placeholder say?'
+      translatable: true
+    noresults_in_view:
+      type: string
+      label: 'What should be displayed if no stores are found after searching a location?'
+      translatable: true
+    noresults:
+      type: string
+      label: 'What should be displayed if no stores are available?'
+      translatable: true
+    display_search_marker:
+      type: boolean
+      label: 'Display "You are Here" marker on the map?'
+    web_link_target:
+      type: string
+      label: 'Target to open result links'
+    web_link_custom_target:
+      type: string
+      label: 'Define the custom target to open links'
+    items_per_panel:
+      type: integer
+      label: 'How many stores should show in the panel?'
+    map_lat:
+      type: float
+      label: 'Default Map center point (Latitude)'
+    map_long:
+      type: float
+      label: 'Default Map center point (Longitude)'
+    map_zoom:
+      type: float
+      label: 'Default zoom level'
+    max_zoom:
+      type: float
+      label: 'Maximum zoom level'
+    loc_search_zoom:
+      type: float
+      label: 'Maximum zoom level'
+    marker_icon:
+      type: uri
+      label: 'Marker Icon'
+    proximity_enabled:
+      type: boolean
+      label: 'Display proximity in google search.'
+    proximity_metric:
+      type: string
+      label: 'Proximity measure unit'
+    json_path:
+      type: uri
+      label: 'Path to Store Location data'
+    data_cache_enabled:
+      type: boolean
+      label: 'Enable client-side caching for the store data response'
+    display_path:
+      type: uri
+      label: 'What is the desired path for the store locator?'
+    loc_aware:
+      type: boolean
+      label: 'Enable Map with Location Awareness'
+    loc_aware_zoom:
+      type: float
+      label: 'Set Location Awareness Zoom Level'
+    lang_aware:
+      type: boolean
+      label: 'Enable language awareness for the map controls'
+    map_cluster:
+      type: boolean
+      label: 'Enable marker clustering'
+    map_cluster_grid:
+      type: integer
+      label: 'Cluster Grid size'
+    cluster_zoom_limit:
+      type: float
+      label: 'Cluster Zoom limit'
+    cluster_image_path:
+      type: uri
+      label: 'Path the the cluster images'
+    viewport:
+      type: boolean
+      label: 'Enable Viewport Marker Management'
+    marker_zoom_limit:
+      type: float
+      label: 'Marker Zoom limit'
+    map_style:
+      type: string
+      label: 'Google map style'

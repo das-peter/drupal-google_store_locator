@@ -1,0 +1,10 @@
+route_callbacks:
+  - 'Drupal\google_store_locator\Routing\Routes::routes'
+
+google_store_locator.configuration:
+  path: '/admin/config/search/google-store-locator'
+  defaults:
+    _title: 'Google Store Locator'
+    _form: 'Drupal\google_store_locator\Controller\GoogleStoreLocatorSettingsController'
+  requirements:
+    _permission: 'access google_store_locator administration pages'

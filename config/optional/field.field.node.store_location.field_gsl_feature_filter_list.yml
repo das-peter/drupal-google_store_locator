@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_gsl_feature_filter_list
+    - node.type.store_location
+  module:
+    - options
+id: node.store_location.field_gsl_feature_filter_list
+field_name: field_gsl_feature_filter_list
+entity_type: node
+bundle: store_location
+label: Features
+description: 'Define which features are available on a store location. Used to filter the list in the store location map.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

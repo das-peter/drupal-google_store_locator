@@ -1,0 +1,42 @@
+google_store_locator:
+  version: 1.x
+  css:
+    component:
+      theme/google_store_locator.css: { minified: false }
+  js:
+    js/google_store_locator.js: { minified: false, attributes: { defer: true } }
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
+    - google_store_locator/libraries.googlemaps-js-store-locator
+    - google_store_locator/libraries.googlemaps-js-marker-clusterer
+
+google_store_locator_loc_aware:
+  version: 1.x
+  js:
+    js/google_store_locator_loc_aware.js: { minified: false, attributes: { defer: true } }
+  dependencies:
+    - google_store_locator/google_store_locator
+
+# External libraries.
+libraries.googlemaps-js-store-locator:
+  remote: https://github.com/googlemaps/js-store-locator
+  version: '1.0.0'
+  license:
+    name: Apache License 2.0
+    url: https://github.com/googlemaps/js-store-locator/blob/gh-pages/LICENSE
+    gpl-compatible: true
+  css:
+    component:
+      /libraries/js-store-locator/css/storelocator.css: { minified: false }
+  js:
+    /libraries/js-store-locator/dist/store-locator.min.js: { minified: true, attributes: { defer: true } }
+libraries.googlemaps-js-marker-clusterer:
+  remote: https://github.com/googlemaps/js-marker-clusterer
+  version: '1.0.0'
+  license:
+    name: Apache License 2.0
+    url: https://github.com/googlemaps/js-marker-clusterer/blob/gh-pages/LICENSE
+    gpl-compatible: true
+  js:
+    /libraries/js-marker-clusterer/src/markerclusterer.js: { minified: false, attributes: { defer: true }  }
