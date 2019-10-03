@@ -858,9 +858,9 @@
     this.storeList_.empty();
 
     if (!stores.length) {
-      this.storeList_.append('<li class="no-stores">' + drupalSettings.gsl[Drupal.GSL.currentMap.mapid]['no_results'] + '</li>');
+      this.storeList_.append('<li class="no-stores">' + drupalSettings.gsl[Drupal.GSL.currentMap.mapid]['no_results'].toString() + '</li>');
     } else if (bounds && !bounds.contains(stores[0].getLocation())) {
-      this.storeList_.append('<li class="no-stores">' + drupalSettings.gsl[Drupal.GSL.currentMap.mapid]['no_results_in_view'] + '</li>');
+      this.storeList_.append('<li class="no-stores">' + drupalSettings.gsl[Drupal.GSL.currentMap.mapid]['no_results_in_view'].toString() + '</li>');
     }
 
     var clickHandler = function() {

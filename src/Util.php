@@ -40,7 +40,7 @@ class Util {
     $settings = [
       'datapath' => \Drupal\Core\Url::fromUri($config->get('json_path'))
         ->toString(),
-      'dataCacheEnabled' => $config->get('data_cache_enabled'),
+      'dataCacheEnabled' => (bool) $config->get('data_cache_enabled'),
       'mapzoom' => intval($config->get('map_zoom')),
       'mapcluster' => intval($config->get('map_cluster')),
       'mapclusterzoom' => intval($config->get('map_cluster_zoom')),
@@ -49,16 +49,16 @@ class Util {
         $config->get('map_cluster_image_path')
       ),
       'map_style' => json_decode($config->get('map_style')),
-      'viewportManage' => $config->get('viewport_manage'),
+      'viewportManage' => (bool) $config->get('viewport_manage'),
       'viewportMarkerLimit' => intval($config->get('viewport_marker_limit')),
-      'maplong' => $config->get('map_long'),
-      'maplat' => $config->get('map_lat'),
-      'search_label' => $config->get('search_label'),
-      'search_placeholder' => $config->get('search_placeholder'),
-      'no_results' => $config->get('no_results'),
-      'no_results_in_view' => $config->get('no_results_in_view'),
+      'maplong' => (float) $config->get('map_long'),
+      'maplat' => (float) $config->get('map_lat'),
+      'search_label' => (string) $config->get('search_label'),
+      'search_placeholder' => (string) $config->get('search_placeholder'),
+      'no_results' => (string) $config->get('noresults'),
+      'no_results_in_view' => (string) $config->get('noresults_in_view'),
       'loc_search_zoom' => (int) $config->get('loc_search_zoom'),
-      'link_target' => $config->get('link_target'),
+      'link_target' => (string) $config->get('link_target'),
     ];
 
     if (!empty($config->get('items_per_panel'))) {
