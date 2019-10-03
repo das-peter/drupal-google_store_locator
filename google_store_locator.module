@@ -7,56 +7,6 @@
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\Config;
 
-function google_store_locator_default_settings(Config $config) {
-  $settings = [
-    'datapath' => \Drupal\Core\Url::fromUri($config->get('json_path'))->toString(),
-    'dataCacheEnabled' => $config->get('data_cache_enabled'),
-    'mapzoom' => intval($config->get('map_zoom')),
-    'mapcluster' => intval($config->get('map_cluster')),
-    'mapclusterzoom' => intval($config->get('map_cluster_zoom')),
-    'mapclustergrid' => intval($config->get('map_cluster_grid')),
-    'mapclusterimagepath' => Html::escape(
-      $config->get('map_cluster_image_path')
-    ),
-    'map_style' => json_decode($config->get('map_style')),
-    'viewportManage' => $config->get('viewport_manage'),
-    'viewportMarkerLimit' => intval($config->get('viewport_marker_limit')),
-    'maplong' => $config->get('map_long'),
-    'maplat' => $config->get('map_lat'),
-    'search_label' => $config->get('search_label'),
-    'search_placeholder' => $config->get('search_placeholder'),
-    'no_results' => $config->get('no_results'),
-    'no_results_in_view' => $config->get('no_results_in_view'),
-    'loc_search_zoom' => (int) $config->get('loc_search_zoom'),
-    'link_target' => $config->get('link_target'),
-  ];
-
-  if (!empty($config->get('items_per_panel'))) {
-    $settings['items_per_panel'] = $config->get('items_per_panel');
-  }
-
-  if (!empty($config->get('marker_path'))) {
-    $settings['marker_url'] = file_create_url($config->get('marker_path'));
-  }
-
-  if (!empty($config->get('feature_list'))) {
-    $settings['feature_list'] = $config->get('feature_list');
-  }
-
-  if (!empty($config->get('loc_aware'))) {
-    $settings['loc_aware_zoom'] = (int) $config->get('loc_aware_zoom');
-  }
-
-  $marker_icon_fid = $config->get('marker_icon');
-  if (!empty($marker_icon_fid)) {
-    $marker_file = \Drupal\file\Entity\File::load($marker_icon_fid);
-    $settings['marker_path'] = $marker_file->toUrl();
-  }
-
-  return $settings;
-}
-
-
 /**
  * Implements hook_theme().
  */
@@ -215,4 +165,28 @@ function google_store_locator_admin_form_submit($form, &$form_state) {
     );
   }
   menu_rebuild();
+}
+
+/**
+ * Implements hook_help().
+ */
+function google_store_locator_help(
+  $route_name,
+  \Drupal\Core\Routing\RouteMatchInterface $route_match
+) {
+  $content = '';
+  switch ($route_name) {
+    case 'help.page.google_store_locator':
+      $t_args = [];
+      $content .= '<h3>' . t('Configuration: Libraries: Help') . '</h3>';
+      $content .= '<p>' . t('The Google Store Locator module utilizes third-party Open Source libraries to enhance functionality.') . ' ' .
+        t('It is recommended that these libraries are installed in your Drupal installations <code>/libraries</code> directory.') . ' ' .
+        '</p>' .
+        '<p>' . t('There are several ways to download the needed third-party libraries.') . '</p>' .
+        '<p><strong>' . t('Recommended') . '</strong></p>' .
+        '<ul>' .
+        '  <li>' . t('Use the <a href="https://github.com/wikimedia/composer-merge-plugin">Composer Merge plugin</a> to include the Google Store Locator module\'s <a href="https://cgit.drupalcode.org/google_store_locator/tree/composer.libraries.json">composer.libraries.json</a>.', $t_args) . '<br/>You can use the same approach as for Webform: <strong>' . t('<a href="https://www.drupal.org/node/3003140">Learn more &raquo;</a>') . '</strong>'. '</li>' .
+        '</ul>';
+  }
+  return $content;
 }
