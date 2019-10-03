@@ -6,43 +6,16 @@
     "license": "GPL-2.0+",
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://asset-packagist.org"
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "googlemaps/js-store-locator",
-                "version": "1.0",
-                "type": "drupal-library",
-                "dist": {
-                    "url": "https://github.com/googlemaps/js-store-locator/archive/gh-pages.zip",
-                    "type": "zip"
-                }
-            }
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "googlemaps/js-marker-clusterer",
-                "version": "1.0",
-                "type": "drupal-library",
-                "dist": {
-                    "url": "https://github.com/googlemaps/js-marker-clusterer/archive/gh-pages.zip",
-                    "type": "zip"
-                }
-            }
-        }
-    ],
+    "support": {
+        "issues": "https://www.drupal.org/project/issues/google_store_locator?version=8.x",
+        "source": "http://cgit.drupalcode.org/google_store_locator",
+        "docs": "https://www.drupal.org/docs/8/modules/google_store_locator"
+    },
     "require": {
         "drupal/core": "^8.6",
         "drupal/address": "^1.6",
         "drupal/geofield": "~1.0",
         "drupal/geocoder": "~3.0",
-        "drupal/views_geojson": "~1.0",
-        "googlemaps/js-store-locator": "~1.0",
-        "googlemaps/js-marker-clusterer": "~1.0"
+        "drupal/views_geojson": "~1.0"
     }
 }

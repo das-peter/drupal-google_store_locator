@@ -1,0 +1,67 @@
+{
+  "name": "drupal/webform",
+  "description": "Enables the creation of webforms and questionnaires.",
+  "type": "drupal-module",
+  "license": "GPL-2.0+",
+  "minimum-stability": "dev",
+  "homepage": "https://drupal.org/project/webform",
+  "authors": [
+    {
+      "name": "Jacob Rockowitz (jrockowitz)",
+      "homepage": "https://www.drupal.org/u/jrockowitz",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Alexander Trotsenko (bucefal91)",
+      "homepage": "https://www.drupal.org/u/bucefal91",
+      "role": "Co-maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/google_store_locator?version=8.x",
+    "source": "http://cgit.drupalcode.org/google_store_locator",
+    "docs": "https://www.drupal.org/docs/8/modules/google_store_locator"
+  },
+  "repositories": {
+    "googlemaps/js-store-locator": {
+      "type": "package",
+      "package": {
+        "name": "googlemaps/js-store-locator",
+        "extra": {
+          "installer-name": "js-store-locator"
+        },
+        "version": "1.0",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/googlemaps/js-store-locator/archive/gh-pages.zip",
+          "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
+        }
+      }
+    },
+    "googlemaps/js-marker-clusterer": {
+      "type": "package",
+      "package": {
+        "name": "googlemaps/js-marker-clusterer",
+        "extra": {
+          "installer-name": "js-marker-clusterer"
+        },
+        "version": "1.0",
+        "type": "drupal-library",
+        "dist": {
+          "url": "https://github.com/googlemaps/js-marker-clusterer/archive/gh-pages.zip",
+          "type": "zip"
+        },
+        "require": {
+          "composer/installers": "~1.0"
+        }
+      }
+    }
+  },
+  "require": {
+    "googlemaps/js-store-locator": "*",
+    "googlemaps/js-marker-clusterer": "*"
+  }
+}
