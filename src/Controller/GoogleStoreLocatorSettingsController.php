@@ -190,6 +190,8 @@ class GoogleStoreLocatorSettingsController extends ConfigFormBase {
 
     // Store the keys we want to save in configuration when form is submitted.
     $keys_to_save = array_keys($form['configuration']);
+    $keys_to_save = array_combine($keys_to_save, $keys_to_save);
+    unset($keys_to_save['web_link_custom_target']);
     foreach ($keys_to_save as $key => $key_to_save) {
       if (strpos($key_to_save, '#') !== FALSE) {
         unset($keys_to_save[$key]);
@@ -221,20 +223,17 @@ class GoogleStoreLocatorSettingsController extends ConfigFormBase {
     $config = $this->config('google_store_locator.settings');
     $storage = $form_state->getStorage();
 
+    // Set link target property.
+    if ($form_state->getValue('web_link_target') == 'custom') {
+      $form_state->setValue('web_link_target', $form_state->getValue('web_link_custom_target'));
+    }
+
     // Save all the GSL configuration items from $form_state.
     foreach ($form_state->getValues() as $key => $value) {
       if (in_array($key, $storage['keys'])) {
         $config->set($key, $value);
       }
     }
-
-    // Set link target property.
-    if ($form_state->getValue(['form_settings', 'web_link_target']) == 'custom') {
-      $form_state->setValue(['form_settings', 'web_link_target'], $form_state->getValue(['form_settings', 'web_link_custom_target']));
-    }
-
-    // Save the GSL forms from $form_state into a 'form_settings' array.
-    $config->set('form_settings', $form_state->getValue('form_settings'));
 
     $config->save();
 
