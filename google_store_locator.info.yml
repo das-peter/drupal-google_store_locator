@@ -10,6 +10,6 @@ dependencies:
   geofield: 'drupal:geofield'
   libraries: 'drupal:libraries'
   views: 'drupal:views'
-  'views_geojson (>=7.x-1.0-beta2)': 'views_geojson (>=7.x-1.0-beta2):views_geojson (>=7.x-1.0-beta2)'
+  views_geojson: 'drupal:views_geojson'
   text: 'drupal:text'
 type: module
