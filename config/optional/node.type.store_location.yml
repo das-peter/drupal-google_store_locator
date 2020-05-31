@@ -2,7 +2,7 @@ langcode: en
 status: true
 dependencies: {  }
 name: 'Store Location'
-type: page
+type: store_location
 description: 'Use <em>Store Location</em> to provide stores for your store locator map.'
 help: ''
 new_revision: true
