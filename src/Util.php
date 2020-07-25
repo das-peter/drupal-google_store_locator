@@ -38,7 +38,7 @@ class Util {
    */
   public static function getDefaultSettings(Config $config) {
     $settings = [
-      'datapath' => \Drupal\Core\Url::fromUri($config->get('json_path'))
+      'datapath' => \Drupal\Core\Url::fromUserInput($config->get('json_path'))
         ->toString(),
       'dataCacheEnabled' => (bool) $config->get('data_cache_enabled'),
       'mapzoom' => intval($config->get('map_zoom')),
